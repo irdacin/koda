@@ -1,6 +1,6 @@
 class Item {
   final int? id;
-  final String name;
+  final String? name;
   final double weight;
   final String description;
 
