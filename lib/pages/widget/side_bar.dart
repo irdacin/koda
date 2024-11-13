@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:koda/database/database_item.dart';
 import 'package:koda/pages/form_item_page.dart';
+import 'package:koda/pages/settings_page.dart';
 import 'package:provider/provider.dart';
 
 class SideBar extends StatelessWidget {
@@ -11,20 +12,27 @@ class SideBar extends StatelessWidget {
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          colors: [Colors.blue, Colors.purple], // Gradient colors
-          begin: Alignment.topCenter, // Start of the gradient
-          end: Alignment.bottomCenter, // End of the gradient
+          colors: [Colors.blue, Colors.purple],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
         ),
       ),
+      height: MediaQuery.of(context).size.height,
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Column(
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               IconButton(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 24, horizontal: 5),
-                onPressed: () {},
+                padding: const EdgeInsets.symmetric(
+                  vertical: 24,
+                  horizontal: 5,
+                ),
+                onPressed: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => SettingsPage(),
+                  ));
+                },
                 icon: const Icon(Icons.settings),
                 color: Colors.white,
               ),
@@ -32,27 +40,32 @@ class SideBar extends StatelessWidget {
                 width: 20,
                 height: 5,
                 decoration: BoxDecoration(
-                    color: Colors.yellow,
-                    borderRadius: BorderRadius.circular(20)),
+                  color: Colors.yellow,
+                  borderRadius: BorderRadius.circular(20),
+                ),
               ),
             ],
           ),
-          Column(
-            children: [
-              FutureBuilder(
+          const SizedBox(height: 5),
+          Expanded(
+            child: SingleChildScrollView(
+              child: FutureBuilder(
                 future: Provider.of<DatabaseItem>(context).read(),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     return Column(
-                      children: snapshot.data!
-                          .map((e) => Container(
-                                width: 30,
-                                height: 30,
-                                margin: const EdgeInsets.all(5),
-                                decoration: BoxDecoration(
-                                    color: const Color(0xffA9a9a9),
-                                    borderRadius: BorderRadius.circular(10)),
-                              ))
+                      children: snapshot.data!.reversed
+                          .map(
+                            (e) => Container(
+                              width: 30,
+                              height: 30,
+                              margin: const EdgeInsets.all(5),
+                              decoration: BoxDecoration(
+                                color: const Color(0xffA9a9a9),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                          )
                           .toList(),
                     );
                   }
@@ -60,7 +73,11 @@ class SideBar extends StatelessWidget {
                   return Container();
                 },
               ),
-              const SizedBox(height: 5),
+            ),
+          ),
+          const SizedBox(height: 5),
+          Column(
+            children: [
               Container(
                 width: 20,
                 height: 5,
@@ -70,12 +87,16 @@ class SideBar extends StatelessWidget {
                 ),
               ),
               IconButton(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 50, horizontal: 5),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 50,
+                  horizontal: 5,
+                ),
                 onPressed: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => const FormItemPage(),
-                  ));
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const FormItemPage(),
+                    ),
+                  );
                 },
                 icon: const Icon(
                   Icons.add,
@@ -84,7 +105,7 @@ class SideBar extends StatelessWidget {
                 color: Colors.yellow,
               ),
             ],
-          )
+          ),
         ],
       ),
     );

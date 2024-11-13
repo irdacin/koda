@@ -20,8 +20,13 @@ class Home extends StatelessWidget {
         }
 
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: CircularProgressIndicator(),
+          return Flexible(
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
+              alignment: Alignment.center,
+              child: const CircularProgressIndicator(color: Colors.blue),
+            ),
           );
         }
 
@@ -33,23 +38,23 @@ class Home extends StatelessWidget {
                 vertical: 30,
               ),
               child: ListView.separated(
-                  separatorBuilder: (context, index) =>
-                      const SizedBox(height: 24),
-                  itemCount: snapshot.data!.length,
-                  itemBuilder: (context, index) {
-                    Item item = snapshot.data![index];
-                    return Dismissible(
-                      key: Key(index.toString()),
-                      background: Container(
-                        color: Colors.red,
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        alignment: Alignment.centerRight,
-                        child: const Icon(
-                          Icons.delete,
-                          color: Colors.white,
-                        ),
+                separatorBuilder: (context, index) =>
+                    const SizedBox(height: 24),
+                itemCount: snapshot.data!.length,
+                itemBuilder: (context, index) {
+                  Item item = snapshot.data![index];
+                  return Dismissible(
+                    key: Key(index.toString()),
+                    background: Container(
+                      color: Colors.red,
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      alignment: Alignment.centerRight,
+                      child: const Icon(
+                        Icons.delete,
+                        color: Colors.white,
                       ),
-                      direction: DismissDirection.endToStart,
+                    ),
+                    direction: DismissDirection.endToStart,
                       onDismissed: (direction) {
                         Provider.of<DatabaseItem>(
                           context,
@@ -67,53 +72,56 @@ class Home extends StatelessWidget {
                               onTap: () {
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
-                                    builder: (context) =>
-                                        ItemDetailPage(item: item),
+                                  builder: (context) => ItemDetailPage(
+                                    item: item,
                                   ),
-                                );
-                              },
-                              leading: Container(
-                                width: 75,
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
                                 ),
-                              ),
-                              title: Text(
-                                item.name ?? "Folder",
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontStyle: FontStyle.italic,
-                                ),
-                              ),
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 20,
-                                vertical: 10,
-                              ),
-                              subtitle: Text(
-                                item.description,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                              );
+                            },
+                            leading: Container(
+                              width: 75,
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
                               ),
                             ),
-                          ),
-                          Positioned(
-                            top: 5,
-                            right: 5,
-                            child: IconButton(
-                              icon: const Icon(Icons.edit),
-                              onPressed: () {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          FormItemPage(item: item)),
-                                );
-                              },
+                            title: Text(
+                              item.name ?? "Folder",
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 10,
+                            ),
+                            subtitle: Text(
+                              item.description,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                        ],
-                      ),
-                    );
-                  }),
+                        ),
+                        Positioned(
+                          top: 5,
+                          right: 5,
+                          child: IconButton(
+                            icon: const Icon(Icons.edit),
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      FormItemPage(item: item),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
             ),
           );
         }

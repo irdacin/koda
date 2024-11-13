@@ -40,8 +40,9 @@ class _FormItemPageState extends State<FormItemPage> {
                   child: Container(
                     padding: const EdgeInsets.all(40),
                     decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(30),
-                        color: const Color(0xffd9d9d9)),
+                      borderRadius: BorderRadius.circular(30),
+                      color: const Color(0xffd9d9d9),
+                    ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -49,25 +50,30 @@ class _FormItemPageState extends State<FormItemPage> {
                           width: MediaQuery.of(context).size.width,
                           height: 200,
                           decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(20)),
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
                           alignment: Alignment.center,
                           child: const Text(
                             "Picture",
                             style: TextStyle(
-                                fontSize: 18, color: Color(0xff636c72)),
+                              fontSize: 18,
+                              color: Color(0xff636c72),
+                            ),
                           ),
                         ),
                         const SizedBox(height: 24),
                         TextFormField(
                           controller: nameController,
                           decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  borderSide: BorderSide.none),
-                              hintText: "name",
-                              filled: true,
-                              fillColor: Colors.white),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide.none,
+                            ),
+                            hintText: "name",
+                            filled: true,
+                            fillColor: Colors.white,
+                          ),
                         ),
                         const SizedBox(height: 24),
                         TextFormField(
@@ -75,8 +81,9 @@ class _FormItemPageState extends State<FormItemPage> {
                           keyboardType: TextInputType.number,
                           decoration: InputDecoration(
                             border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: BorderSide.none),
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide.none,
+                            ),
                             filled: true,
                             fillColor: Colors.white,
                             hintText: "weight",
@@ -84,47 +91,50 @@ class _FormItemPageState extends State<FormItemPage> {
                         ),
                         const SizedBox(height: 24),
                         TextFormField(
-                            controller: descriptionController,
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  borderSide: BorderSide.none),
-                              filled: true,
-                              fillColor: Colors.white,
-                              hintText: "description",
+                          controller: descriptionController,
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide.none,
                             ),
-                            minLines: 4,
-                            maxLines: null),
+                            filled: true,
+                            fillColor: Colors.white,
+                            hintText: "description",
+                          ),
+                          minLines: 4,
+                          maxLines: null,
+                        ),
                         const SizedBox(height: 24),
                         ElevatedButton(
-                            onPressed: () {
-                              Item newItem = Item(
-                                  id: widget.item?.id,
-                                  name: nameController.text,
-                                  weight: double.parse(weightController.text),
-                                  description: descriptionController.text);
+                          onPressed: () {
+                            Item newItem = Item(
+                              id: widget.item?.id,
+                              name: nameController.text,
+                              weight: double.parse(weightController.text),
+                              description: descriptionController.text,
+                            );
 
-                              if (widget.item case _?) {
-                                Provider.of<DatabaseItem>(context,
-                                        listen: false)
-                                    .update(newItem);
-                              } else {
-                                Provider.of<DatabaseItem>(context,
-                                        listen: false)
-                                    .insert(newItem);
-                              }
+                            if (widget.item case _?) {
+                              Provider.of<DatabaseItem>(context, listen: false)
+                                  .update(newItem);
+                            } else {
+                              Provider.of<DatabaseItem>(context, listen: false)
+                                  .insert(newItem);
+                            }
 
-                              Navigator.of(context).pop();
-                            },
-                            style: ElevatedButton.styleFrom(
-                              foregroundColor: Colors.white,
-                              backgroundColor: Colors.blue,
-                              minimumSize: const Size(double.infinity, 0),
-                              padding: const EdgeInsets.all(10),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10)),
+                            Navigator.of(context).pop();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            backgroundColor: Colors.blue,
+                            minimumSize: const Size(double.infinity, 0),
+                            padding: const EdgeInsets.all(10),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
                             ),
-                            child: const Text("Done"))
+                          ),
+                          child: const Text("Done"),
+                        )
                       ],
                     ),
                   ),

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:koda/database/database_service.dart';
 import 'package:koda/models/item_model.dart';
 import 'package:sqflite/sqflite.dart';
@@ -13,7 +13,8 @@ class DatabaseItem extends ChangeNotifier {
 
   Future<void> createTable(Database db) async {
     await db.execute(
-        "CREATE TABLE $tableName ($columnId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, $columnName TEXT, $columnWeight REAL, $columnDescription TEXT)");
+      "CREATE TABLE $tableName ($columnId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, $columnName TEXT, $columnWeight REAL, $columnDescription TEXT)",
+    );
   }
 
   Future<List<Item>> read() async {
@@ -37,14 +38,15 @@ class DatabaseItem extends ChangeNotifier {
   Future<void> update(Item item) async {
     final db = await databaseService.database;
     db.update(
-        tableName,
-        {
-          columnName: item.name,
-          columnWeight: item.weight,
-          columnDescription: item.description
-        },
-        where: "id = ?",
-        whereArgs: [item.id]);
+      tableName,
+      {
+        columnName: item.name,
+        columnWeight: item.weight,
+        columnDescription: item.description
+      },
+      where: "id = ?",
+      whereArgs: [item.id],
+    );
     notifyListeners();
   }
 

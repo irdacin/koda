@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:koda/database/database_item.dart';
-import 'package:koda/pages/home_page.dart';
+import 'package:koda/pages/main_page.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
         ),
         debugShowCheckedModeBanner: false,
-        home: const HomePage(),
+        home: const MainPage(),
       ),
     );
   }

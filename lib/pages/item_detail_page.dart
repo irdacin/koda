@@ -14,7 +14,7 @@ class ItemDetailPage extends StatelessWidget {
         child: Row(
           children: [ 
             ItemDetail(item: item),
-            const SideBar(),
+            SideBar(),
           ],
         ),
       ),
