@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:koda/database/database_item.dart';
+import 'package:koda/pages/coffee_api_page.dart';
 import 'package:koda/pages/form_item_page.dart';
 import 'package:koda/pages/settings_page.dart';
 import 'package:provider/provider.dart';
@@ -25,7 +26,7 @@ class SideBar extends StatelessWidget {
             children: [
               IconButton(
                 padding: const EdgeInsets.symmetric(
-                  vertical: 24,
+                  // vertical: 24,
                   horizontal: 5,
                 ),
                 onPressed: () {
@@ -34,6 +35,18 @@ class SideBar extends StatelessWidget {
                   ));
                 },
                 icon: const Icon(Icons.settings),
+                color: Colors.white,
+              ),
+              IconButton(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 5,
+                ),
+                onPressed: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const CoffeeApiPage(),
+                  ));
+                },
+                icon: const Icon(Icons.coffee),
                 color: Colors.white,
               ),
               Container(
