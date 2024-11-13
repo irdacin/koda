@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:koda/helper/constant.dart';
+import 'package:koda/pages/login_page.dart';
 import 'package:koda/pages/main_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -20,7 +22,19 @@ class _SettingsPageState extends State<SettingsPage> {
     loadData();
   }
 
-  void loadData() async {
+  Future<void> logOutUser() async {
+    await FirebaseAuth.instance.signOut();
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setBool(KEY_LOGGED_IN, false);
+
+    if (!mounted) return;
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (context) => const LoginPage()),
+      (route) => false,
+    );
+  }
+
+  Future<void> loadData() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       showSideBar = prefs.getBool(KEY_SHOW_SIDE_BAR) ?? true;
@@ -28,7 +42,7 @@ class _SettingsPageState extends State<SettingsPage> {
     });
   }
 
-  void save(String key) async {
+  Future<void> save(String key) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(
       key,
@@ -49,18 +63,18 @@ class _SettingsPageState extends State<SettingsPage> {
                   IconButton(
                     onPressed: () {
                       Navigator.of(context).pushReplacement(MaterialPageRoute(
-                        builder: (context) => MainPage(),
+                        builder: (context) => const MainPage(),
                       ));
                     },
-                    icon: Icon(
+                    icon: const Icon(
                       Icons.arrow_back,
                       size: 30,
                     ),
                   ),
-                  SizedBox(width: 20),
-                  Icon(Icons.settings),
-                  SizedBox(width: 20),
-                  Text(
+                  const SizedBox(width: 20),
+                  const Icon(Icons.settings),
+                  const SizedBox(width: 20),
+                  const Text(
                     "Settings",
                     style: TextStyle(
                       fontSize: 24,
@@ -69,33 +83,33 @@ class _SettingsPageState extends State<SettingsPage> {
                 ],
               ),
             ),
-            Divider(),
+            const Divider(),
             ListTile(
               onTap: () {},
-              title: Text("Profile"),
+              title: const Text("Profile"),
             ),
             ListTile(
               onTap: () {},
-              title: Text("Appearrance"),
+              title: const Text("Appearrance"),
             ),
             ListTile(
               onTap: () {},
-              title: Text("Theme"),
+              title: const Text("Theme"),
             ),
             ListTile(
               onTap: () {},
-              title: Text("Notification"),
+              title: const Text("Notification"),
             ),
             ListTile(
               onTap: () {},
-              title: Text("Language"),
+              title: const Text("Language"),
             ),
             Padding(
               padding: const EdgeInsets.all(16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
+                  const Text(
                     "Sidebar",
                     style: TextStyle(
                       fontSize: 16,
@@ -110,7 +124,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                 borderRadius: BorderRadius.circular(10),
                               )
                             : null,
-                        padding: EdgeInsets.all(5),
+                        padding: const EdgeInsets.all(5),
                         child: InkWell(
                           onTap: () {
                             setState(() {
@@ -127,14 +141,14 @@ class _SettingsPageState extends State<SettingsPage> {
                           ),
                         ),
                       ),
-                      SizedBox(width: 5),
-                      Text(
+                      const SizedBox(width: 5),
+                      const Text(
                         "/",
                         style: TextStyle(
                           fontSize: 18,
                         ),
                       ),
-                      SizedBox(width: 5),
+                      const SizedBox(width: 5),
                       Container(
                         decoration: !showSideBar
                             ? BoxDecoration(
@@ -142,7 +156,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                 borderRadius: BorderRadius.circular(10),
                               )
                             : null,
-                        padding: EdgeInsets.all(5),
+                        padding: const EdgeInsets.all(5),
                         child: InkWell(
                           onTap: () {
                             setState(() {
@@ -166,7 +180,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             if (showSideBar)
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -177,7 +191,7 @@ class _SettingsPageState extends State<SettingsPage> {
                               borderRadius: BorderRadius.circular(10),
                             )
                           : null,
-                      padding: EdgeInsets.all(5),
+                      padding: const EdgeInsets.all(5),
                       child: InkWell(
                         onTap: () {
                           setState(() {
@@ -193,14 +207,14 @@ class _SettingsPageState extends State<SettingsPage> {
                         ),
                       ),
                     ),
-                    SizedBox(width: 5),
-                    Text(
+                    const SizedBox(width: 5),
+                    const Text(
                       "/",
                       style: TextStyle(
                         fontSize: 18,
                       ),
                     ),
-                    SizedBox(width: 5),
+                    const SizedBox(width: 5),
                     Container(
                       decoration: showSideBarInRight
                           ? BoxDecoration(
@@ -208,7 +222,7 @@ class _SettingsPageState extends State<SettingsPage> {
                               borderRadius: BorderRadius.circular(10),
                             )
                           : null,
-                      padding: EdgeInsets.all(5),
+                      padding: const EdgeInsets.all(5),
                       child: InkWell(
                         onTap: () {
                           setState(() {
@@ -226,7 +240,12 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                   ],
                 ),
-              )
+              ),
+            ListTile(
+              onTap: logOutUser,
+              leading: const Icon(Icons.logout),
+              title: const Text("Log Out"),
+            )
           ],
         ),
       ),

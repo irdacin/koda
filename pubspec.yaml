@@ -39,6 +39,8 @@ dependencies:
   path:
   provider:
   shared_preferences:
+  firebase_core:
+  firebase_auth:
 
 dev_dependencies:
   flutter_test:

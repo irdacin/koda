@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1041415994886",
+    "project_id": "koda-ddb4a",
+    "storage_bucket": "koda-ddb4a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1041415994886:android:5a43ebe34243aebbba0d87",
+        "android_client_info": {
+          "package_name": "com.example.koda"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCW_j-pdT6_5mYbA1bUAs7-K2XOqunA-DI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

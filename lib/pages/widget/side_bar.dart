@@ -30,7 +30,7 @@ class SideBar extends StatelessWidget {
                 ),
                 onPressed: () {
                   Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => SettingsPage(),
+                    builder: (context) => const SettingsPage(),
                   ));
                 },
                 icon: const Icon(Icons.settings),
