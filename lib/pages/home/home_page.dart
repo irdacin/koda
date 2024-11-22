@@ -1,27 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:koda/helper/constant.dart';
-import 'package:koda/pages/widget/home.dart';
-import 'package:koda/pages/widget/side_bar.dart';
+import 'package:koda/helpers/constant.dart';
+import 'package:koda/pages/home/widget/home.dart';
+import 'package:koda/pages/home/widget/side_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class MainPage extends StatefulWidget {
+class HomePage extends StatefulWidget {
   final int index;
 
-  const MainPage({
+  const HomePage({
     super.key,
     this.index = 0,
   });
 
   @override
-  State<MainPage> createState() => _MainPageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _MainPageState extends State<MainPage> {
+class _HomePageState extends State<HomePage> {
   bool showSideBar = true;
   bool showSideBarInRight = true;
 
   List<Widget> pages = [
-    const Home(),
+    Home(),
   ];
 
   @override
@@ -44,9 +44,9 @@ class _MainPageState extends State<MainPage> {
       body: SafeArea(
         child: Row(
           children: [
-            if (showSideBar && !showSideBarInRight) const SideBar(),
+            if (showSideBar && !showSideBarInRight) SideBar(context),
             pages[widget.index],
-            if (showSideBar && showSideBarInRight) const SideBar(),
+            if (showSideBar && showSideBarInRight) SideBar(context),
           ],
         ),
       ),

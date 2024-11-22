@@ -16,10 +16,9 @@ class DatabaseService {
   }
 
   Future<Database> initDatabase() async {
-    final databaseDirPath = await getDatabasesPath();
+    final String databaseDirPath = await getDatabasesPath();
     final databasePath = join(databaseDirPath, "item.db");
-    final database =
-        await openDatabase(databasePath, version: 1, onCreate: onCreate);
+    final database = openDatabase(databasePath, version: 1, onCreate: onCreate);
     return database;
   }
 

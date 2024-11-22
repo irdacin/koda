@@ -1,9 +1,8 @@
-import 'package:flutter/foundation.dart';
 import 'package:koda/database/database_service.dart';
 import 'package:koda/models/item_model.dart';
 import 'package:sqflite/sqflite.dart';
 
-class DatabaseItem extends ChangeNotifier {
+class DatabaseItem {
   final String tableName = "item";
   final String columnId = "id";
   final String columnName = "name";
@@ -27,32 +26,21 @@ class DatabaseItem extends ChangeNotifier {
 
   Future<void> insert(Item item) async {
     final db = await databaseService.database;
-    db.insert(tableName, {
-      columnName: item.name,
-      columnWeight: item.weight,
-      columnDescription: item.description
-    });
-    notifyListeners();
+    db.insert(tableName, item.toDatabase());
   }
 
   Future<void> update(Item item) async {
     final db = await databaseService.database;
     db.update(
       tableName,
-      {
-        columnName: item.name,
-        columnWeight: item.weight,
-        columnDescription: item.description
-      },
+      item.toDatabase(),
       where: "id = ?",
       whereArgs: [item.id],
     );
-    notifyListeners();
   }
 
   Future<void> delete(int id) async {
     final db = await databaseService.database;
     db.delete(tableName, where: "id = ?", whereArgs: [id]);
-    notifyListeners();
   }
 }

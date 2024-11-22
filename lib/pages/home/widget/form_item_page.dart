@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:koda/database/database_item.dart';
 import 'package:koda/models/item_model.dart';
-import 'package:provider/provider.dart';
 
 class FormItemPage extends StatefulWidget {
   final Item? item;
@@ -16,6 +15,8 @@ class _FormItemPageState extends State<FormItemPage> {
   TextEditingController nameController = TextEditingController();
   TextEditingController weightController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
+
+  final DatabaseItem db = DatabaseItem();
 
   @override
   void initState() {
@@ -114,13 +115,7 @@ class _FormItemPageState extends State<FormItemPage> {
                               description: descriptionController.text,
                             );
 
-                            if (widget.item case _?) {
-                              Provider.of<DatabaseItem>(context, listen: false)
-                                  .update(newItem);
-                            } else {
-                              Provider.of<DatabaseItem>(context, listen: false)
-                                  .insert(newItem);
-                            }
+                            widget.item != null ? db.update(newItem) : db.insert(newItem);
 
                             Navigator.of(context).pop();
                           },
