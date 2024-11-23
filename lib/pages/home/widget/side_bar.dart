@@ -1,141 +1,73 @@
 import 'package:flutter/material.dart';
-import 'package:koda/database/database_item.dart';
 import 'package:koda/pages/home/settings_page.dart';
-import 'package:koda/pages/home/widget/form_item_page.dart';
+import 'package:sidebarx/sidebarx.dart';
 
 Widget SideBar(BuildContext context) {
-  final DatabaseItem db = DatabaseItem();
+  final SidebarXController controller = SidebarXController(selectedIndex: 0);
 
-  return Container(
-    decoration: const BoxDecoration(
-      gradient: LinearGradient(
-        colors: [Colors.blue, Colors.purple],
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
+  return SidebarX(
+    controller: controller,
+    theme: SidebarXTheme(
+      decoration: BoxDecoration(
+        color: const Color(0xffBE3E3E),
+        // borderRadius: BorderRadius.circular(20),
+      ),
+      iconTheme: const IconThemeData(
+        color: Colors.white,
+        size: 24,
+      ),
+      textStyle: const TextStyle(color: Colors.white),
+      selectedItemDecoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8),
+        color: const Color(0xffBE3E3E),
+      ),
+      selectedIconTheme: const IconThemeData(
+        color: Colors.white,
+      ),
+      selectedTextStyle: const TextStyle(
+        color: Colors.white,
+        fontWeight: FontWeight.bold,
       ),
     ),
-    height: MediaQuery.of(context).size.height,
-    child: Column(
-      children: [
-        Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            IconButton(
-              padding: const EdgeInsets.symmetric(
-                // vertical: 24,
-                horizontal: 5,
-              ),
-              onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const SettingsPage(),
-                ));
-              },
-              icon: const Icon(Icons.settings),
-              color: Colors.white,
-            ),
-            IconButton(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 5,
-              ),
-              onPressed: () {},
-              icon: const Icon(Icons.history),
-              color: Colors.white,
-            ),
-            Container(
-              width: 20,
-              height: 5,
-              decoration: BoxDecoration(
-                color: Colors.yellow,
-                borderRadius: BorderRadius.circular(20),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 5),
-        Flexible(
-          child: Align(
-            alignment: Alignment.bottomCenter,
-            child: SingleChildScrollView(
-              child: FutureBuilder(
-                future: db.read(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: snapshot.data!.reversed
-                          .map(
-                            (e) => GestureDetector(
-                              // onTap: () {
-                              //   Navigator.of(context).push(MaterialPageRoute(
-                              //     builder: (context) => ItemDetailPage(item: e),
-                              //   ));
-                              // },
-                              child: Container(
-                                width: 30,
-                                height: 30,
-                                margin: const EdgeInsets.all(5),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xffA9a9a9),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                alignment: Alignment.center,
-                                child: Text(
-                                  e.name == null
-                                      ? "F"
-                                      : e.name!.isNotEmpty
-                                          ? e.name![0].toUpperCase()
-                                          : "F",
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          )
-                          .toList(),
-                    );
-                  }
-
-                  return Container();
-                },
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(height: 5),
-        Column(
-          children: [
-            Container(
-              width: 20,
-              height: 5,
-              decoration: BoxDecoration(
-                color: Colors.yellow,
-                borderRadius: BorderRadius.circular(20),
-              ),
-            ),
-            IconButton(
-              padding: const EdgeInsets.symmetric(
-                vertical: 50,
-                horizontal: 5,
-              ),
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const FormItemPage(),
-                  ),
-                );
-              },
-              icon: const Icon(
-                Icons.add,
-                size: 30,
-              ),
-              color: Colors.yellow,
-            ),
-          ],
-        ),
-      ],
+    extendedTheme: const SidebarXTheme(
+      width: 200,
+      decoration: BoxDecoration(
+        color: Color(0xffBE3E3E),
+      ),
     ),
+    // extendIcon: Icons.,
+    collapseIcon: Icons.abc,
+    headerBuilder: (context, extended) {
+      return const Padding(
+        padding: EdgeInsets.all(0),
+        child: CircleAvatar(
+          radius: 40,
+          backgroundColor: Colors.white,
+          child: Icon(Icons.account_circle, size: 40, color: Colors.red),
+        ),
+      );
+    },
+    items: [
+      SidebarXItem(
+        icon: Icons.person,
+        label: 'Profile',
+        onTap: () {
+          debugPrint('Profile Tapped');
+        },
+      ),
+      SidebarXItem(
+        icon: Icons.settings,
+        label: 'Settings',
+        onTap: () {
+          Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => SettingsPage(),
+          ));
+        },
+      ),
+      const SidebarXItem(
+        icon: Icons.logout,
+        label: 'Sign out',
+      ),
+    ],
   );
 }

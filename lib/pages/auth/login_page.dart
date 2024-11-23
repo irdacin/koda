@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:koda/helpers/constant.dart';
-import 'package:koda/pages/auth/widget/input_field.dart';
-import 'package:koda/pages/home/home_page.dart';
+import 'package:koda/components/input_field.dart';
+import 'package:koda/pages/intro/main_page.dart';
 import 'package:koda/pages/auth/register_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -37,7 +37,7 @@ class _LoginPageState extends State<LoginPage> {
 
       if (!mounted) return;
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const HomePage()),
+        MaterialPageRoute(builder: (context) => const MainPage()),
       );
     } on FirebaseAuthException catch (_) {
       setState(() {

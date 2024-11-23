@@ -2,8 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:koda/helpers/constant.dart';
 import 'package:koda/pages/auth/login_page.dart';
-import 'package:koda/pages/auth/widget/input_field.dart';
-import 'package:koda/pages/home/home_page.dart';
+import 'package:koda/components/input_field.dart';
+import 'package:koda/pages/intro/main_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -67,7 +67,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
       if (!mounted) return;
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const HomePage()),
+        MaterialPageRoute(builder: (context) => const MainPage()),
       );
     } on FirebaseAuthException catch (e) {
       setState(() {

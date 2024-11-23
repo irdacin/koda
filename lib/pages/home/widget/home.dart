@@ -35,9 +35,10 @@ Widget Home() {
             ),
             child: Column(
               children: [
-                const Text(
-                  "Koda",
-                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                TextField(
+                  decoration: InputDecoration(
+                    hintText: "Search"
+                  ),
                 ),
                 const SizedBox(height: 20),
                 Expanded(

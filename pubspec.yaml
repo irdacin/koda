@@ -37,11 +37,10 @@ dependencies:
   cupertino_icons: ^1.0.6
   sqflite:
   path:
-  provider:
+  sidebarx:
   shared_preferences:
   firebase_core:
   firebase_auth:
-  http: ^1.2.2
 
 dev_dependencies:
   flutter_test:

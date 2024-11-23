@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:koda/helpers/constant.dart';
 import 'package:koda/pages/auth/login_page.dart';
-import 'package:koda/pages/home/home_page.dart';
+import 'package:koda/pages/intro/main_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -63,7 +63,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   IconButton(
                     onPressed: () {
                       Navigator.of(context).pushReplacement(MaterialPageRoute(
-                        builder: (context) => const HomePage(),
+                        builder: (context) => const MainPage(),
                       ));
                     },
                     icon: const Icon(
