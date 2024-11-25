@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:koda/components/bottom_nav_bar.dart';
 import 'package:koda/helpers/constant.dart';
-import 'package:koda/pages/home/activities_page.dart';
-import 'package:koda/pages/home/storage_page.dart';
-import 'package:koda/pages/home/store_page.dart';
+import 'package:koda/pages/activities/activities_page.dart';
+import 'package:koda/pages/storage/storage_page.dart';
+import 'package:koda/pages/store/store_page.dart';
 import 'package:koda/pages/home/widget/side_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -15,6 +15,7 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
+  TextEditingController searchController = TextEditingController();
   bool showSideBar = true;
   bool showSideBarInRight = true;
   int index = 0;
@@ -42,46 +43,67 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: TextField(
+          onChanged: (value) {
+            setState(() {});
+          },
+          controller: searchController,
+          decoration: InputDecoration(
+            border: OutlineInputBorder(
+              borderSide: BorderSide.none,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            suffixIcon: searchController.text.isNotEmpty
+                ? IconButton(
+                    onPressed: () {
+                      searchController.clear();
+                    },
+                    icon: const Icon(Icons.cancel_outlined),
+                  )
+                : Icon(
+                    Icons.manage_search_rounded,
+                    size: 30,
+                  ),
+            filled: true,
+            fillColor: Color(0xffd9d9d9),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          ),
+        ),
+        actions: [
+          IconButton(
+            onPressed: () {},
+            icon: Icon(
+              Icons.account_circle_rounded,
+              size: 30,
+            ),
+          ),
+          SizedBox(width: 10),
+        ],
+      ),
       body: pages[index],
       bottomNavigationBar: BottomNavBar(
         currentIndex: index,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.store),
-            label: "STORE"
+            label: "STORE",
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.storage),
-            label: "STORAGE"
+            label: "STORAGE",
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.local_activity_outlined),
-            label: "ACTIVITIES"
+            label: "ACTIVITIES",
           ),
         ],
         onTap: (value) {
           setState(() {
             index = value;
           });
-        }
-      ),
-      floatingActionButton: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          FloatingActionButton(
-            backgroundColor: const Color(0xffd9d9d9),
-            onPressed: () {},
-            heroTag: null,
-            child: const Icon(Icons.edit),
-          ),
-          const SizedBox(height: 12),
-          FloatingActionButton(
-            backgroundColor: const Color(0xffd9d9d9),
-            heroTag: null,
-            onPressed: () {},
-            child: const Icon(Icons.add),
-          ),
-        ],
+        },
       ),
     );
   }
