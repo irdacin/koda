@@ -14,8 +14,8 @@ class BottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+    return Container(
+      color: Colors.transparent,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         mainAxisSize: MainAxisSize.min,
@@ -27,29 +27,35 @@ class BottomNavBar extends StatelessWidget {
 
           return Expanded(
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 10),
               child: GestureDetector(
                 onTap: () => onTap?.call(index),
-                child: Material(
-                  elevation: isSelected ? 8 : 4,
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    topRight: Radius.circular(20),
-                  ),
-                  child: Container(
-                    height: isSelected ? 80 : 50,
-                    color: isSelected ? item.backgroundColor : null,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
+                child: Container(
+                  height: isSelected ? 80 : 50,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(15),
+                      topRight: Radius.circular(15),
                     ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      item.label ?? "",
-                      style: TextStyle(
-                        fontWeight:
-                            isSelected ? FontWeight.bold : FontWeight.normal,
+                    boxShadow: [
+                      BoxShadow(
+                        blurRadius: isSelected ? 25 : 15,
+                        blurStyle: BlurStyle.normal,
+                        color: Color(0xff3a3b3c),
+                        offset: Offset.zero,
+                        spreadRadius: 2,
                       ),
+                    ],
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    item.label ?? "",
+                    style: TextStyle(
+                      fontWeight:
+                          isSelected ? FontWeight.bold : FontWeight.normal,
+                      fontSize: isSelected ? 15 : 12,
                     ),
                   ),
                 ),

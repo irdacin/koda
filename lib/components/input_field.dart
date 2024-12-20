@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:koda/helpers/app_colors.dart';
 
 class InputField extends StatefulWidget {
   final String? labelText;
@@ -57,6 +58,9 @@ class _InputFieldState extends State<InputField> {
       autovalidateMode: AutovalidateMode.onUserInteraction,
       onChanged: (value) => widget.onChanged?.call(value),
       focusNode: widget.focusNode,
+      style: TextStyle(
+        color: AppColors.text,
+      ),
       decoration: InputDecoration(
         enabledBorder: const OutlineInputBorder(
           borderSide: BorderSide(
