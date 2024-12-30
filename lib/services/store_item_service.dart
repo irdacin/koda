@@ -75,27 +75,34 @@ class StoreItemService {
   Future<void> updateToStorageItem(StoreItem storeItem) async {
     final StorageItemService storageItemService = StorageItemService();
 
-    final List<StorageItem> storageItems = await storageItemService.getStorageItemsList();
+    final List<StorageItem> storageItems =
+        await storageItemService.getStorageItemsList();
     await Future.wait(storageItems.map((storageItem) async {
-
       final currentItems = storageItem.useForStoreItem ?? [];
-      final updatedItems = currentItems.where((element) => element != storeItem.id);
-      await storageItemService.updateStorageItem(
-        storageItem.copyWith(useForStoreItem: updatedItems.toList()),
-      );
+      if (currentItems.contains(storeItem.id)) {
+        final updatedItems =
+            currentItems.where((element) => element != storeItem.id).toList();
+        await storageItemService.updateStorageItem(
+          storageItem.copyWith(useForStoreItem: updatedItems),
+        );
+      }
     }).toList());
 
     await Future.wait((storeItem.usedStorageItems ?? []).map((e) async {
-      StorageItem? storageItem =
-          await storageItemService.getStorageItem(e["id"]);
+      StorageItem? storageItem = storageItems.cast().firstWhere(
+        (item) => item.id == e["id"],
+        orElse: () => null,
+      );
+
       if (storageItem == null) return;
 
       final currentItems = storageItem.useForStoreItem ?? [];
-      final updatedItems = {...currentItems, storeItem.id!};
-
-      await storageItemService.updateStorageItem(
-        storageItem.copyWith(useForStoreItem: updatedItems.toList()),
-      );
+      if (!currentItems.contains(storeItem.id)) {
+        final updatedItems = [...currentItems, storeItem.id!];
+        await storageItemService.updateStorageItem(
+          storageItem.copyWith(useForStoreItem: updatedItems),
+        );
+      }
     }).toList());
   }
 

@@ -377,7 +377,8 @@ class _EditStoreFormItemDialogState extends State<EditStoreFormItemDialog>
                               overflow: TextOverflow.ellipsis,
                               fontSize: 10,
                             ),
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 5),
+                            contentPadding:
+                                const EdgeInsets.symmetric(horizontal: 5),
                             filled: true,
                             fillColor: AppColors.main,
                           ),
@@ -452,7 +453,8 @@ class _EditStoreFormItemDialogState extends State<EditStoreFormItemDialog>
                       textAlign: TextAlign.end,
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 5),
+                        contentPadding:
+                            const EdgeInsets.symmetric(horizontal: 5),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(5),
                           borderSide: BorderSide(color: AppColors.secondary),
@@ -674,9 +676,7 @@ class _EditStoreFormItemDialogState extends State<EditStoreFormItemDialog>
                   description: descriptionController.text,
                 );
                 await _storeItemService.updateStoreItem(newItem);
-                if (widget.item.usedStorageItems != newItem.usedStorageItems) {
-                  await _storeItemService.updateToStorageItem(newItem);
-                }
+                await _storeItemService.updateToStorageItem(newItem);
 
                 setState(() => _isLoadingSaveIntoFirebase = false);
                 navigator.pop();
