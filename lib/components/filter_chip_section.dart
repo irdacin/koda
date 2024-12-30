@@ -110,11 +110,12 @@ class _FilterChipSectionState extends State<FilterChipSection> {
                     ),
                   ),
                 ),
+                onBeforePopupOpening: labelWidget.onBeforePopupOpening,
                 selectedItem: selectedValue,
                 popupProps: PopupProps.menu(
                   showSelectedItems: true,
                   emptyBuilder: (context, searchEntry) {
-                    return SizedBox.shrink();
+                    return const SizedBox.shrink();
                   },
                   itemBuilder: (context, item, isDisabled, isSelected) {
                     return Container(
@@ -123,16 +124,16 @@ class _FilterChipSectionState extends State<FilterChipSection> {
                           color: isSelected ? widget.selectedColor : null,
                           borderRadius: BorderRadius.only(
                             topLeft: item == widget.dropdownItem?.first
-                                ? Radius.circular(8)
+                                ? const Radius.circular(8)
                                 : Radius.zero,
                             topRight: item == widget.dropdownItem?.first
-                                ? Radius.circular(8)
+                                ? const Radius.circular(8)
                                 : Radius.zero,
                             bottomLeft: item == widget.dropdownItem?.last
-                                ? Radius.circular(8)
+                                ? const Radius.circular(8)
                                 : Radius.zero,
                             bottomRight: item == widget.dropdownItem?.last
-                                ? Radius.circular(8)
+                                ? const Radius.circular(8)
                                 : Radius.zero,
                           )),
                       child: Text(

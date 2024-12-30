@@ -53,6 +53,7 @@ class _FormItemDialogState extends State<FormItemDialog>
         right: 15,
         bottom: isKeyboardOpen ? 20 : 100,
       ),
+      
       elevation: 10,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
@@ -78,10 +79,10 @@ class _FormItemDialogState extends State<FormItemDialog>
               right: 0,
               child: Container(
                 height: 60,
-                padding: EdgeInsets.only(left: 10, right: 5),
+                padding: const EdgeInsets.only(left: 10, right: 5),
                 decoration: BoxDecoration(
                   color: AppColors.secondary,
-                  borderRadius: BorderRadius.only(
+                  borderRadius: const BorderRadius.only(
                     bottomLeft: Radius.circular(10),
                     bottomRight: Radius.circular(10)
                   )

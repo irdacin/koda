@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 
 class SearchBarField extends StatefulWidget {
   final ValueChanged<String>? onSearchChanged;
+  final VoidCallback? onClose;
   final Color? backgroundColor;
 
   const SearchBarField({
     super.key,
     this.onSearchChanged,
+    this.onClose,
     this.backgroundColor,
   });
 
@@ -30,13 +32,12 @@ class _SearchBarFieldState extends State<SearchBarField> {
         suffixIcon: searchController.text.isNotEmpty
             ? IconButton(
                 onPressed: () {
-                  setState(() {
-                    searchController.clear();
-                  });
+                  setState(() => searchController.clear());
+                  widget.onClose?.call();
                 },
                 icon: const Icon(Icons.cancel_outlined),
               )
-            : Icon(
+            : const Icon(
                 Icons.search,
                 size: 25,
                 color: Colors.black,

@@ -1,4 +1,4 @@
-import 'package:koda/database/database_item.dart';
+import 'package:koda/services/database_item.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 

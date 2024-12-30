@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:koda/helpers/constant.dart';
 import 'package:koda/pages/auth/login_page.dart';
 import 'package:koda/components/input_field.dart';
-import 'package:koda/pages/intro/main_page.dart';
+import 'package:koda/pages/home/main_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterPage extends StatefulWidget {

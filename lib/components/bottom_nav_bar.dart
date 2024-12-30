@@ -41,11 +41,11 @@ class BottomNavBar extends StatelessWidget {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        blurRadius: isSelected ? 25 : 15,
+                        blurRadius: 15,
                         blurStyle: BlurStyle.normal,
-                        color: Color(0xff3a3b3c),
+                        color: const Color(0xff3a3b3c),
                         offset: Offset.zero,
-                        spreadRadius: 2,
+                        spreadRadius: isSelected ? 10 : 2,
                       ),
                     ],
                   ),

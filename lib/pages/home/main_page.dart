@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:koda/components/bottom_nav_bar.dart';
-import 'package:koda/pages/home/activities_page.dart';
-import 'package:koda/pages/home/storage_page.dart';
-import 'package:koda/pages/home/store_page.dart';
+import 'package:koda/pages/activities/activities_page.dart';
+import 'package:koda/pages/storage/storage_page.dart';
+import 'package:koda/pages/store/store_page.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
