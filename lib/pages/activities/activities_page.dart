@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:koda/components/filter_chip_section.dart';
 import 'package:koda/components/search_bar_field.dart';
-import 'package:koda/helpers/app_colors.dart';
-import 'package:koda/pages/home/settings_page.dart';
+import 'package:koda/utils/app_colors.dart';
+import 'package:koda/pages/settings/settings_page.dart';
 
 class ActivitiesPage extends StatefulWidget {
   const ActivitiesPage({super.key});

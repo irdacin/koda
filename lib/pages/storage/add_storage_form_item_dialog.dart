@@ -2,9 +2,10 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:koda/helpers/app_colors.dart';
+import 'package:koda/utils/app_colors.dart';
 import 'package:koda/models/storage_item_model.dart';
 import 'package:koda/services/image_service.dart';
 import 'package:koda/services/storage_item_service.dart';
@@ -106,12 +107,16 @@ class _AddStorageFormItemDialogState extends State<AddStorageFormItemDialog>
             _buildImageForm(context),
             const SizedBox(height: 15),
             _buildTextFieldForm(
-                hintText: "Product Name", controller: nameController),
+              hintText: AppLocalizations.of(context)!.productName,
+              controller: nameController,
+            ),
             const SizedBox(height: 15),
-            _buildFormInputQuantity(controller: weightController),
+            _buildFormInputQuantity(
+              controller: weightController,
+            ),
             const SizedBox(height: 15),
             _buildTextFieldForm(
-              hintText: "Description",
+              hintText: AppLocalizations.of(context)!.description,
               maxLines: 3,
               controller: descriptionController,
             ),
@@ -152,7 +157,7 @@ class _AddStorageFormItemDialogState extends State<AddStorageFormItemDialog>
                         ),
                       ),
                       const SizedBox(height: 10),
-                      const Text("Take Picture")
+                      Text(AppLocalizations.of(context)!.takePicture),
                     ],
                   ),
                   Column(
@@ -177,7 +182,7 @@ class _AddStorageFormItemDialogState extends State<AddStorageFormItemDialog>
                         ),
                       ),
                       const SizedBox(height: 10),
-                      const Text("From Gallery")
+                      Text(AppLocalizations.of(context)!.fromGallery),
                     ],
                   ),
                 ],
@@ -259,9 +264,10 @@ class _AddStorageFormItemDialogState extends State<AddStorageFormItemDialog>
       maxLines: maxLines ?? 1,
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: const TextStyle(
+        hintStyle: TextStyle(
           overflow: TextOverflow.ellipsis,
           fontSize: 12,
+          color: AppColors.text,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(5),
@@ -380,9 +386,7 @@ class _AddStorageFormItemDialogState extends State<AddStorageFormItemDialog>
                   ),
                 ),
                 onChanged: (value) {
-                  setState(() {
-                    _selectedUnit = value!;
-                  });
+                  setState(() => _selectedUnit = value!);
                 },
               ),
             ),
@@ -453,7 +457,7 @@ class _AddStorageFormItemDialogState extends State<AddStorageFormItemDialog>
                         strokeWidth: 3,
                       ),
                     )
-                  : const Text("Save"),
+                  : Text(AppLocalizations.of(context)!.save),
             ),
           ),
           const SizedBox(width: 5),

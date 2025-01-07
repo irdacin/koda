@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:koda/utils/app_colors.dart';
 
 class BottomNavBar extends StatelessWidget {
   final int currentIndex;
@@ -34,18 +35,17 @@ class BottomNavBar extends StatelessWidget {
                   height: isSelected ? 80 : 50,
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppColors.main,
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(15),
                       topRight: Radius.circular(15),
                     ),
                     boxShadow: [
                       BoxShadow(
-                        blurRadius: 15,
-                        blurStyle: BlurStyle.normal,
+                        blurRadius: 25,
                         color: const Color(0xff3a3b3c),
                         offset: Offset.zero,
-                        spreadRadius: isSelected ? 10 : 2,
+                        spreadRadius: isSelected ? 2 : 0.5,
                       ),
                     ],
                   ),

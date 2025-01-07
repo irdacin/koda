@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:koda/helpers/constant.dart';
 import 'package:koda/components/input_field.dart';
 import 'package:koda/pages/home/main_page.dart';
@@ -41,7 +42,7 @@ class _LoginPageState extends State<LoginPage> {
       );
     } on FirebaseAuthException catch (_) {
       setState(() {
-        errorText = "Invalid email or password";
+        errorText = AppLocalizations.of(context)!.invalidEmailOrPassword;
       });
     }
   }
@@ -59,9 +60,9 @@ class _LoginPageState extends State<LoginPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Center(
+                Center(
                   child: Text(
-                    "LOGIN",
+                    AppLocalizations.of(context)!.login.toUpperCase(),
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 30,
@@ -72,7 +73,7 @@ class _LoginPageState extends State<LoginPage> {
                 InputField(
                   controller: emailController,
                   focusNode: emailFocusNode,
-                  labelText: "Email",
+                  labelText: AppLocalizations.of(context)!.email,
                   errorText: errorText,
                   icon: Icons.email,
                   onChanged: (value) {
@@ -90,7 +91,7 @@ class _LoginPageState extends State<LoginPage> {
                       errorText = null;
                     });
                   },
-                  labelText: "Password",
+                  labelText: AppLocalizations.of(context)!.password,
                   icon: Icons.lock,
                   errorText: errorText,
                   isVisible: showPasswordText,
@@ -119,13 +120,13 @@ class _LoginPageState extends State<LoginPage> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    child: const Text("LOGIN"),
+                    child: Text(AppLocalizations.of(context)!.login.toUpperCase()),
                   ),
                 ),
                 Row(
                   children: [
-                    const Text(
-                      "Don't have an account?",
+                    Text(
+                      AppLocalizations.of(context)!.dontHaveAnAccount,
                     ),
                     TextButton(
                       onPressed: () {
@@ -135,10 +136,7 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         );
                       },
-                      style: TextButton.styleFrom(
-                        foregroundColor: Colors.black,
-                      ),
-                      child: const Text("REGISTER"),
+                      child: Text(AppLocalizations.of(context)!.register.toUpperCase()),
                     )
                   ],
                 )

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:koda/helpers/app_colors.dart';
+import 'package:koda/utils/app_colors.dart';
 
 class InputField extends StatefulWidget {
   final String? labelText;

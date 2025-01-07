@@ -3,6 +3,8 @@ import 'package:koda/components/bottom_nav_bar.dart';
 import 'package:koda/pages/activities/activities_page.dart';
 import 'package:koda/pages/storage/storage_page.dart';
 import 'package:koda/pages/store/store_page.dart';
+import 'package:koda/providers/navigation_bar_provider.dart';
+import 'package:provider/provider.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -33,18 +35,18 @@ class _MainPageState extends State<MainPage> {
               right: 10,
               child: BottomNavBar(
                 currentIndex: index,
-                items: const [
+                items: [
                   BottomNavigationBarItem(
-                    icon: Icon(Icons.store),
-                    label: "STORE",
+                    icon: const Icon(Icons.store),
+                    label: Provider.of<NavigationBarProvider>(context).store,
                   ),
                   BottomNavigationBarItem(
-                    icon: Icon(Icons.storage),
-                    label: "STORAGE",
+                    icon: const Icon(Icons.storage),
+                    label: Provider.of<NavigationBarProvider>(context).storage,
                   ),
                   BottomNavigationBarItem(
-                    icon: Icon(Icons.local_activity_outlined),
-                    label: "ACTIVITIES",
+                    icon: const Icon(Icons.local_activity_outlined),
+                    label: Provider.of<NavigationBarProvider>(context).activities,
                   ),
                 ],
                 onTap: (value) {

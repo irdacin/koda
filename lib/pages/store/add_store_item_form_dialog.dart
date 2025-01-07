@@ -3,9 +3,10 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:koda/helpers/app_colors.dart';
+import 'package:koda/utils/app_colors.dart';
 import 'package:koda/models/storage_item_model.dart';
 import 'package:koda/models/store_item_model.dart';
 import 'package:koda/services/image_service.dart';
@@ -115,19 +116,19 @@ class _AddFormStoreItemDialogState extends State<AddFormStoreItemDialog>
           _buildImageForm(context),
           const SizedBox(height: 15),
           _buildTextFieldForm(
-            hintText: "Product Name",
+            hintText: AppLocalizations.of(context)!.productName,
             controller: nameController,
           ),
           const SizedBox(height: 15),
           _buildTextFieldForm(
-            hintText: "Product Category",
+            hintText: AppLocalizations.of(context)!.productCategory,
             controller: categoryController,
           ),
           const SizedBox(height: 15),
           _buildFormSelectedStorageItem(context),
           const SizedBox(height: 15),
           _buildTextFieldForm(
-            hintText: "Description",
+            hintText: AppLocalizations.of(context)!.description,
             maxLines: 3,
             controller: descriptionController,
           ),
@@ -165,7 +166,7 @@ class _AddFormStoreItemDialogState extends State<AddFormStoreItemDialog>
                         ),
                       ),
                       const SizedBox(height: 10),
-                      const Text("Take Picture")
+                      Text(AppLocalizations.of(context)!.takePicture),
                     ],
                   ),
                   Column(
@@ -186,7 +187,7 @@ class _AddFormStoreItemDialogState extends State<AddFormStoreItemDialog>
                         ),
                       ),
                       const SizedBox(height: 10),
-                      const Text("From Gallery")
+                      Text(AppLocalizations.of(context)!.fromGallery)
                     ],
                   ),
                 ],
@@ -271,9 +272,10 @@ class _AddFormStoreItemDialogState extends State<AddFormStoreItemDialog>
       controller: controller,
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: const TextStyle(
+        hintStyle: TextStyle(
           overflow: TextOverflow.ellipsis,
           fontSize: 12,
+          color: AppColors.text,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(5),
@@ -342,10 +344,12 @@ class _AddFormStoreItemDialogState extends State<AddFormStoreItemDialog>
                               borderSide:
                                   BorderSide(color: AppColors.secondary),
                             ),
-                            hintText: "Choose Storage Item",
-                            hintStyle: const TextStyle(
+                            hintText:
+                                AppLocalizations.of(context)!.chooseStorageItem,
+                            hintStyle: TextStyle(
                               overflow: TextOverflow.ellipsis,
                               fontSize: 10,
+                              color: AppColors.text,
                             ),
                             contentPadding:
                                 const EdgeInsets.symmetric(horizontal: 5),
@@ -537,6 +541,7 @@ class _AddFormStoreItemDialogState extends State<AddFormStoreItemDialog>
         String? name = e["name"];
         String? unit = e["unit"];
         double? quantity = e["quantity"];
+
         return Container(
           decoration: BoxDecoration(
             border: Border.all(color: AppColors.secondary),
@@ -667,7 +672,7 @@ class _AddFormStoreItemDialogState extends State<AddFormStoreItemDialog>
                         strokeWidth: 3,
                       ),
                     )
-                  : const Text("Save"),
+                  : Text(AppLocalizations.of(context)!.save),
             ),
           ),
           const SizedBox(width: 5),

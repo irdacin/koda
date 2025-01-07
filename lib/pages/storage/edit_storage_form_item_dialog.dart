@@ -2,9 +2,10 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:koda/helpers/app_colors.dart';
+import 'package:koda/utils/app_colors.dart';
 import 'package:koda/models/storage_item_model.dart';
 import 'package:koda/services/image_service.dart';
 import 'package:koda/services/storage_item_service.dart';
@@ -124,7 +125,7 @@ class _EditStorageFormItemDialogState extends State<EditStorageFormItemDialog>
             _buildImageForm(context),
             const SizedBox(height: 15),
             _buildTextFieldForm(
-              hintText: "Product Name",
+              hintText: AppLocalizations.of(context)!.productName,
               controller: nameController,
             ),
             const SizedBox(height: 15),
@@ -133,7 +134,7 @@ class _EditStorageFormItemDialogState extends State<EditStorageFormItemDialog>
             ),
             const SizedBox(height: 15),
             _buildTextFieldForm(
-              hintText: "Description",
+              hintText: AppLocalizations.of(context)!.description,
               maxLines: 3,
               controller: descriptionController,
             ),
@@ -176,7 +177,7 @@ class _EditStorageFormItemDialogState extends State<EditStorageFormItemDialog>
                               ),
                             ),
                             const SizedBox(height: 10),
-                            const Text("Take Picture")
+                            Text(AppLocalizations.of(context)!.takePicture),
                           ],
                         ),
                         Column(
@@ -192,8 +193,10 @@ class _EditStorageFormItemDialogState extends State<EditStorageFormItemDialog>
                                 borderRadius: BorderRadius.circular(50),
                               ),
                               child: IconButton(
-                                onPressed: () => _loadImage(context,
-                                    source: ImageSource.gallery),
+                                onPressed: () => _loadImage(
+                                  context,
+                                  source: ImageSource.gallery,
+                                ),
                                 color: Colors.black,
                                 icon: const Icon(
                                   Icons.image,
@@ -201,7 +204,7 @@ class _EditStorageFormItemDialogState extends State<EditStorageFormItemDialog>
                               ),
                             ),
                             const SizedBox(height: 10),
-                            const Text("From Gallery")
+                            Text(AppLocalizations.of(context)!.fromGallery),
                           ],
                         ),
                       ],
@@ -243,7 +246,6 @@ class _EditStorageFormItemDialogState extends State<EditStorageFormItemDialog>
                   decoration: BoxDecoration(
                     image: DecorationImage(
                       image: MemoryImage(_image!),
-                      fit: BoxFit.cover,
                     ),
                     borderRadius: BorderRadius.circular(5),
                   ),
@@ -299,9 +301,10 @@ class _EditStorageFormItemDialogState extends State<EditStorageFormItemDialog>
       maxLines: maxLines ?? 1,
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: const TextStyle(
+        hintStyle: TextStyle(
           overflow: TextOverflow.ellipsis,
           fontSize: 12,
+          color: AppColors.text,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(5),
@@ -496,7 +499,7 @@ class _EditStorageFormItemDialogState extends State<EditStorageFormItemDialog>
                         strokeWidth: 3,
                       ),
                     )
-                  : const Text("Save"),
+                  : Text(AppLocalizations.of(context)!.save),
             ),
           ),
           const SizedBox(width: 5),

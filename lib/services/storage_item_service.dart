@@ -19,7 +19,7 @@ class StorageItemService {
 
   Stream<List<StorageItem>> getStorageItems({
     String searchField = "",
-    String label = "All",
+    String label = "all",
   }) {
     try {
       return _firestore
@@ -27,9 +27,9 @@ class StorageItemService {
           .orderBy("timestamp", descending: false)
           .where(
             "percentage",
-            isEqualTo: label == "Full"
+            isEqualTo: label == "full"
                 ? 1
-                : label == "Empty"
+                : label == "empty"
                     ? 0
                     : null,
             isLessThan: label == "< 50 %" ? 0.5 : null,

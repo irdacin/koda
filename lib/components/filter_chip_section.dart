@@ -1,6 +1,6 @@
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
-import 'package:koda/helpers/app_colors.dart';
+import 'package:koda/utils/app_colors.dart';
 
 class FilterChipSection extends StatefulWidget {
   final List<Widget> chipLabels;
@@ -10,6 +10,7 @@ class FilterChipSection extends StatefulWidget {
   final Color? labelColor;
   final Color? selectedLabelColor;
   final List<String>? dropdownItem;
+  final InputDecoration? dropdownDecoration;
   final Color? iconColor;
   final Color? selectedIconColor;
   final double chipHeight;
@@ -23,6 +24,7 @@ class FilterChipSection extends StatefulWidget {
     this.labelColor,
     this.selectedLabelColor,
     this.dropdownItem,
+    this.dropdownDecoration,
     this.iconColor,
     this.selectedIconColor,
     this.chipHeight = 35,
@@ -73,17 +75,11 @@ class _FilterChipSectionState extends State<FilterChipSection> {
               ),
               child: DropdownSearch<String>(
                 decoratorProps: DropDownDecoratorProps(
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide.none,
-                    ),
-                    hintText: "Categories",
-                    hintStyle: TextStyle(
-                      fontSize: 12,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                  ),
+                  decoration: widget.dropdownDecoration ??
+                      const InputDecoration(
+                        contentPadding: EdgeInsets.fromLTRB(12, 12, 0, 0),
+                        border: OutlineInputBorder(),
+                      ),
                   baseStyle: TextStyle(
                     fontSize: 12,
                     overflow: TextOverflow.ellipsis,

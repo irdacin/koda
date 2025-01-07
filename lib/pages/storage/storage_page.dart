@@ -1,12 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:koda/components/filter_chip_section.dart';
 import 'package:koda/components/search_bar_field.dart';
-import 'package:koda/helpers/app_colors.dart';
+import 'package:koda/utils/app_colors.dart';
+import 'package:koda/helpers/localization_mapper.dart';
 import 'package:koda/models/storage_item_model.dart';
-import 'package:koda/pages/home/settings_page.dart';
+import 'package:koda/pages/settings/settings_page.dart';
 import 'package:koda/pages/storage/add_storage_form_item_dialog.dart';
 import 'package:koda/pages/storage/edit_storage_form_item_dialog.dart';
 import 'package:koda/services/storage_item_service.dart';
@@ -25,7 +27,7 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
   int _indexDelete = -1;
   bool _isKeyboardOpen = false;
   int _indexShowDescription = -1;
-  String _selectedChipLabel = "All";
+  String _selectedChipLabel = "all";
 
   Map<int, int> quantity = {};
   final StorageItemService _storageItemService = StorageItemService();
@@ -148,17 +150,20 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
 
   Widget _buildFilterChipSection() {
     return FilterChipSection(
-      chipLabels: const [
-        Text("All"),
-        Text("Full"),
-        Text("> 50 %"),
-        Text("< 50 %"),
-        Text("Empty"),
+      chipLabels: [
+        Text(AppLocalizations.of(context)!.all),
+        Text(AppLocalizations.of(context)!.full),
+        const Text("> 50 %"),
+        const Text("< 50 %"),
+        Text(AppLocalizations.of(context)!.empty),
       ],
       onSelected: (value) {
-        _storageItemStream = _storageItemService.getStorageItems(
-            searchField: _searchText, label: value);
+        value = getMappedValue(context, value);
         setState(() => _selectedChipLabel = value);
+        _storageItemStream = _storageItemService.getStorageItems(
+          searchField: _searchText,
+          label: value,
+        );
       },
       backgroundColor: AppColors.secondary,
       selectedColor: AppColors.selected,
@@ -181,7 +186,7 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
               return const Center(
                 child: CircularProgressIndicator(
                   color: Colors.blue,
-                ),
+                ), 
               );
             }
 
@@ -207,7 +212,7 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
                           backgroundColor: Colors.red,
                           foregroundColor: Colors.white,
                           borderRadius: BorderRadius.circular(5),
-                          label: "Delete",
+                          label: AppLocalizations.of(context)!.delete,
                         ),
                       ],
                     ),
@@ -302,10 +307,10 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
                       decoration: BoxDecoration(
                         image: DecorationImage(
                           image: imageProvider,
-                          fit: BoxFit.cover,
+                          // fit: BoxFit.cover,
                           opacity: 0.75,
                         ),
-                        color: Colors.black,
+                        color: AppColors.secondary,
                         borderRadius: BorderRadius.circular(15),
                       ),
                     ),
@@ -413,9 +418,9 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
                             ),
                             border: Border.all(color: AppColors.secondary),
                           ),
-                          child: const Text(
-                            "Ton",
-                            style: TextStyle(fontSize: 12),
+                          child: Text(
+                            unit,
+                            style: const TextStyle(fontSize: 12),
                           ),
                         ),
                       ] else
@@ -477,8 +482,9 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
                         minHeight: 60,
                       ),
                       decoration: BoxDecoration(
-                          border: Border.all(color: AppColors.secondary),
-                          borderRadius: BorderRadius.circular(5)),
+                        border: Border.all(color: AppColors.secondary),
+                        borderRadius: BorderRadius.circular(5),
+                      ),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 5,
                         vertical: 3,
@@ -543,7 +549,7 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
     if (!mounted) return;
 
     snackbar.showSnackBar(SnackBar(
-      content: const Text("1 storage item deleted"),
+      content: Text(AppLocalizations.of(context)!.oneStorageItemDeleted),
       behavior: SnackBarBehavior.floating,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
@@ -554,7 +560,7 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
         right: 15,
       ),
       action: SnackBarAction(
-        label: "Undo",
+        label: AppLocalizations.of(context)!.undo,
         textColor: AppColors.selected,
         onPressed: () => _storageItemService.undoDeleteItem(item),
       ),

@@ -19,13 +19,13 @@ class StoreItemService {
 
   Stream<List<StoreItem>> getStoreItems({
     String searchField = "",
-    String label = "All",
+    String label = "all",
   }) {
     try {
       return _firestore
           .collection(_tableName)
           .orderBy("timestamp", descending: false)
-          .where("category", isEqualTo: label == "All" ? null : label)
+          .where("category", isEqualTo: label == "all" ? null : label)
           .snapshots()
           .map((snapshot) {
         return snapshot.docs

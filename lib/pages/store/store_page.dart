@@ -1,13 +1,15 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:koda/components/filter_chip_section.dart';
 import 'package:koda/components/search_bar_field.dart';
-import 'package:koda/helpers/app_colors.dart';
+import 'package:koda/utils/app_colors.dart';
+import 'package:koda/helpers/localization_mapper.dart';
 import 'package:koda/models/store_item_model.dart';
-import 'package:koda/pages/home/settings_page.dart';
+import 'package:koda/pages/settings/settings_page.dart';
 import 'package:koda/pages/store/add_store_item_form_dialog.dart';
 import 'package:koda/pages/store/edit_store_form_item_dialog.dart';
 import 'package:koda/services/store_item_service.dart';
@@ -26,7 +28,7 @@ class _StorePageState extends State<StorePage> with WidgetsBindingObserver {
   int _indexDelete = -1;
   bool _isKeyboardOpen = false;
   int _indexShowDescription = -1;
-  String _selectedChipLabel = "All";
+  String _selectedChipLabel = "all";
 
   final StoreItemService _storeItemService = StoreItemService();
   late Stream<List<StoreItem>> _storeItemStream;
@@ -81,10 +83,10 @@ class _StorePageState extends State<StorePage> with WidgetsBindingObserver {
         body: RefreshIndicator(
           color: Colors.blue,
           onRefresh: () async {
-            setState(() {
-              _storeItemStream =
-                  _storeItemService.getStoreItems(searchField: _searchText);
-            });
+            _storeItemStream = _storeItemService.getStoreItems(
+              searchField: _searchText,
+              label: _selectedChipLabel,
+            );
             ScaffoldMessenger.of(context).hideCurrentSnackBar();
           },
           child: Stack(
@@ -155,7 +157,7 @@ class _StorePageState extends State<StorePage> with WidgetsBindingObserver {
   Widget _buildFilterChipSection() {
     return FilterChipSection(
       chipLabels: [
-        const Text("All"),
+        Text(AppLocalizations.of(context)!.all),
         DropdownSearch<String>(
           onBeforePopupOpening: (selectedItem) async {
             _dropdownItem = await _storeItemService.getStoreCategories();
@@ -165,10 +167,25 @@ class _StorePageState extends State<StorePage> with WidgetsBindingObserver {
         ),
       ],
       dropdownItem: _dropdownItem,
+      dropdownDecoration: InputDecoration(
+        border: const OutlineInputBorder(
+          borderSide: BorderSide.none,
+        ),
+        hintText: AppLocalizations.of(context)!.categories,
+        hintStyle: TextStyle(
+          fontSize: 12,
+          overflow: TextOverflow.ellipsis,
+          color: AppColors.text,
+        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+      ),
       onSelected: (value) {
+        value = getMappedValue(context, value);
         setState(() => _selectedChipLabel = value);
         _storeItemStream = _storeItemService.getStoreItems(
-            searchField: _searchText, label: value);
+          searchField: _searchText,
+          label: value,
+        );
       },
       backgroundColor: AppColors.secondary,
       selectedColor: AppColors.selected,
@@ -350,7 +367,7 @@ class _StorePageState extends State<StorePage> with WidgetsBindingObserver {
                               fontSize: 18,
                             ),
                           ),
-                          child: const Text("Delete"),
+                          child: Text(AppLocalizations.of(context)!.delete),
                         )
                       : IconButton(
                           padding: EdgeInsets.zero,
@@ -384,8 +401,8 @@ class _StorePageState extends State<StorePage> with WidgetsBindingObserver {
                         onPressed: () {},
                         icon: const Icon(Icons.remove),
                       ),
-                      const Text(
-                        "1",
+                      Text(
+                        "0",
                         style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
@@ -405,7 +422,10 @@ class _StorePageState extends State<StorePage> with WidgetsBindingObserver {
   }
 
   Widget _buildStoreItemDescription(
-      BoxConstraints constraints, StoreItem item, int index) {
+    BoxConstraints constraints,
+    StoreItem item,
+    int index,
+  ) {
     bool isShowDescription = _indexShowDescription == index;
 
     return Column(
@@ -430,7 +450,7 @@ class _StorePageState extends State<StorePage> with WidgetsBindingObserver {
                 ),
               ),
               Text(
-                "Description",
+                AppLocalizations.of(context)!.description,
                 style: TextStyle(
                   color: AppColors.secondaryText,
                   overflow: TextOverflow.ellipsis,
@@ -450,18 +470,18 @@ class _StorePageState extends State<StorePage> with WidgetsBindingObserver {
                 },
                 child: isShowDescription
                     ? SizedBox(
-                      height: constraints.maxWidth - 100,
-                      child: SingleChildScrollView(
-                        child: Text(
+                        height: constraints.maxWidth - 100,
+                        child: SingleChildScrollView(
+                          child: Text(
                             item.description ?? "",
                             style: TextStyle(
-                              color: AppColors.main,
+                              color: AppColors.secondaryText,
                               fontSize: 12,
                               overflow: TextOverflow.clip,
                             ),
                           ),
-                      ),
-                    )
+                        ),
+                      )
                     : const SizedBox(),
               ),
             ],
@@ -497,8 +517,10 @@ class _StorePageState extends State<StorePage> with WidgetsBindingObserver {
 
     await _storeItemService.deleteStoreItem(item);
 
+    if (!mounted) return;
+
     snackbar.showSnackBar(SnackBar(
-      content: const Text("1 store item deleted"),
+      content: Text(AppLocalizations.of(context)!.oneStoreItemDeleted),
       behavior: SnackBarBehavior.floating,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
@@ -509,7 +531,7 @@ class _StorePageState extends State<StorePage> with WidgetsBindingObserver {
         right: 15,
       ),
       action: SnackBarAction(
-        label: "Undo",
+        label: AppLocalizations.of(context)!.undo,
         textColor: AppColors.selected,
         onPressed: () => _storeItemService.undoDeleteItem(item),
       ),

@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:koda/helpers/constant.dart';
 import 'package:koda/pages/auth/login_page.dart';
 import 'package:koda/components/input_field.dart';
@@ -95,9 +96,9 @@ class _RegisterPageState extends State<RegisterPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Center(
+                Center(
                   child: Text(
-                    "REGISTER",
+                    AppLocalizations.of(context)!.register.toUpperCase(),
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 30,
@@ -108,7 +109,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 InputField(
                   controller: emailController,
                   focusNode: emailFocusNode,
-                  labelText: "Email",
+                  labelText: AppLocalizations.of(context)!.email,
                   icon: Icons.email,
                   errorText: errorEmailText,
                   onChanged: (value) {
@@ -126,7 +127,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       errorPasswordText = null;
                     });
                   },
-                  labelText: "Password",
+                  labelText: AppLocalizations.of(context)!.password,
                   errorText: errorPasswordText,
                   icon: Icons.lock,
                   trailing: IconButton(
@@ -181,13 +182,13 @@ class _RegisterPageState extends State<RegisterPage> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    child: const Text("REGISTER"),
+                    child: Text(AppLocalizations.of(context)!.register.toUpperCase()),
                   ),
                 ),
                 Row(
                   children: [
-                    const Text(
-                      "Already have an account?",
+                    Text(
+                      AppLocalizations.of(context)!.alreadyHaveAnAccount,
                     ),
                     TextButton(
                       onPressed: () {
@@ -197,10 +198,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           ),
                         );
                       },
-                      style: TextButton.styleFrom(
-                        foregroundColor: Colors.black,
-                      ),
-                      child: const Text("LOGIN"),
+                      child: Text(AppLocalizations.of(context)!.login.toUpperCase()),
                     )
                   ],
                 )
