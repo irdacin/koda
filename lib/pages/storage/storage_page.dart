@@ -26,7 +26,7 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
   bool _openDialog = false;
   int _indexDelete = -1;
   bool _isKeyboardOpen = false;
-  int _indexShowDescription = -1;
+  int _indexShowTheStoreUsed = -1;
   String _selectedChipLabel = "all";
 
   Map<int, int> quantity = {};
@@ -78,11 +78,12 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
         body: RefreshIndicator(
           color: Colors.blue,
           onRefresh: () async {
-            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+            ScaffoldMessenger.of(context).removeCurrentSnackBar();
             _storageItemStream = _storageItemService.getStorageItems(
               searchField: _searchText,
               label: _selectedChipLabel,
             );
+            setState(() {});
           },
           child: Stack(
             children: [
@@ -186,7 +187,7 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
               return const Center(
                 child: CircularProgressIndicator(
                   color: Colors.blue,
-                ), 
+                ),
               );
             }
 
@@ -283,7 +284,8 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
     double maxWeight = item.maxWeight ?? 1;
     double percentage = item.percentage ?? 0;
     String unit = item.unit ?? "Kg";
-    bool isShowDescription = _indexShowDescription == index;
+    List<Map<String, dynamic>> useForStoreItem = item.useForStoreItem ?? [];
+    bool isShowTheStoreUsed = _indexShowTheStoreUsed == index;
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -343,14 +345,28 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
             )
           ],
         ),
+        SizedBox(width: 5),
         Expanded(
           child: GestureDetector(
-            onTap: () {
-              setState(
-                  () => _indexShowDescription = isShowDescription ? -1 : index);
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(10),
+            onTap: useForStoreItem.isEmpty
+                ? null
+                : () {
+                    setState(() => _indexShowTheStoreUsed =
+                        isShowTheStoreUsed ? -1 : index);
+                  },
+            child: Container(
+              decoration: isShowTheStoreUsed
+                  ? BoxDecoration(
+                      border: Border.all(color: AppColors.secondary),
+                      borderRadius: BorderRadius.circular(5),
+                    )
+                  : null,
+              padding: EdgeInsets.only(
+                top: isShowTheStoreUsed ? 9 : 10,
+                left: isShowTheStoreUsed ? 7 : 8,
+                right: 10,
+                bottom: 5,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -360,7 +376,8 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
                         child: Text(
                           name,
                           style: const TextStyle(
-                            fontSize: 15,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -423,11 +440,11 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
                             style: const TextStyle(fontSize: 12),
                           ),
                         ),
-                      ] else
+                      ] else if (useForStoreItem.isNotEmpty)
                         SizedBox(
                           width: 40,
                           child: Icon(
-                            isShowDescription
+                            isShowTheStoreUsed
                                 ? Icons.keyboard_arrow_up_sharp
                                 : Icons.keyboard_arrow_down_sharp,
                           ),
@@ -435,7 +452,7 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
                     ],
                   ),
                   const SizedBox(height: 12),
-                  if (!isShowDescription) ...[
+                  if (!isShowTheStoreUsed) ...[
                     Stack(
                       children: [
                         Container(
@@ -475,27 +492,38 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
                         ),
                       ],
                     )
-                  ] else
-                    Container(
-                      width: MediaQuery.of(context).size.width,
-                      constraints: const BoxConstraints(
-                        minHeight: 60,
-                      ),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: AppColors.secondary),
-                        borderRadius: BorderRadius.circular(5),
-                      ),
+                  ] else ...[
+                    Padding(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 5,
-                        vertical: 3,
+                        horizontal: 10,
                       ),
                       child: Text(
-                        item.description ?? "",
+                        AppLocalizations.of(context)!.listItemsThatUseThisItem,
                         style: const TextStyle(
                           fontSize: 13,
                         ),
                       ),
                     ),
+                    SizedBox(height: 5),
+                    ...useForStoreItem.map(
+                      (storeItem) => Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 3,
+                        ),
+                        width: MediaQuery.of(context).size.width,
+                        decoration: BoxDecoration(
+                          border: Border.all(color: AppColors.secondary),
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        margin: EdgeInsets.only(bottom: 5),
+                        child: Text(
+                          storeItem['name'],
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                      ),
+                    )
+                  ],
                 ],
               ),
             ),
@@ -538,7 +566,7 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
   void _deleteItem(StorageItem item) async {
     setState(() => _indexDelete = -1);
     final snackbar = ScaffoldMessenger.of(context);
-    snackbar.hideCurrentSnackBar();
+    snackbar.removeCurrentSnackBar();
 
     bool isDeleted = await _storageItemService.deleteStorageItem(item);
     if (!isDeleted) {

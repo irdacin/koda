@@ -75,7 +75,6 @@ class _EditStoreFormItemDialogState extends State<EditStoreFormItemDialog>
     categoryController.dispose();
     quantityController.dispose();
     descriptionController.dispose();
-    _selectedStorageItems.clear();
     super.dispose();
   }
 
@@ -176,8 +175,10 @@ class _EditStoreFormItemDialogState extends State<EditStoreFormItemDialog>
                                 borderRadius: BorderRadius.circular(50),
                               ),
                               child: IconButton(
-                                onPressed: () => _loadImage(context,
-                                    source: ImageSource.camera),
+                                onPressed: () => _loadImage(
+                                  context,
+                                  source: ImageSource.camera,
+                                ),
                                 color: Colors.black,
                                 icon: const Icon(Icons.camera_alt),
                               ),
@@ -374,7 +375,8 @@ class _EditStoreFormItemDialogState extends State<EditStoreFormItemDialog>
                               borderSide:
                                   BorderSide(color: AppColors.secondary),
                             ),
-                            hintText: AppLocalizations.of(context)!.chooseStorageItem,
+                            hintText:
+                                AppLocalizations.of(context)!.chooseStorageItem,
                             hintStyle: TextStyle(
                               overflow: TextOverflow.ellipsis,
                               fontSize: 10,
@@ -406,9 +408,17 @@ class _EditStoreFormItemDialogState extends State<EditStoreFormItemDialog>
                                     padding: const EdgeInsets.all(8),
                                     child: Text(
                                       item.name!,
-                                      style: const TextStyle(fontSize: 12),
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          color: isDisabled
+                                              ? AppColors.disableText
+                                              : AppColors.text),
                                     ),
                                   );
+                          },
+                          disabledItemFn: (item) {
+                            return _selectedStorageItems
+                                .any((selected) => selected['id'] == item.id);
                           },
                           fit: FlexFit.loose,
                           showSearchBox: true,
@@ -709,7 +719,10 @@ class _EditStoreFormItemDialogState extends State<EditStoreFormItemDialog>
           Hero(
             tag: 'fab-icon-add',
             child: IconButton(
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () {
+                if (_isLoadingSaveIntoFirebase) return;
+                Navigator.of(context).pop();
+              },
               icon: const Icon(FontAwesomeIcons.xmark),
               iconSize: 30,
               style: IconButton.styleFrom(

@@ -87,7 +87,8 @@ class _StorePageState extends State<StorePage> with WidgetsBindingObserver {
               searchField: _searchText,
               label: _selectedChipLabel,
             );
-            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+            setState(() {});
+            ScaffoldMessenger.of(context).removeCurrentSnackBar();
           },
           child: Stack(
             children: [
@@ -513,7 +514,7 @@ class _StorePageState extends State<StorePage> with WidgetsBindingObserver {
   void _deleteItem(StoreItem item) async {
     setState(() => _indexDelete = -1);
     final snackbar = ScaffoldMessenger.of(context);
-    snackbar.hideCurrentSnackBar();
+    snackbar.removeCurrentSnackBar();
 
     await _storeItemService.deleteStoreItem(item);
 

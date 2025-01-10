@@ -61,9 +61,9 @@ class StorageItemService {
   Future<void> updateToStoreItem(StorageItem storageItem) async {
     final StoreItemService storeItemService = StoreItemService();
 
-    final List<String> useForStoreItems = storageItem.useForStoreItem ?? [];
-    for (String storeItemId in useForStoreItems) {
-      StoreItem? storeItem = await storeItemService.getStoreItem(storeItemId);
+    final List<Map<String, dynamic>> useForStoreItems = storageItem.useForStoreItem ?? [];
+    for (Map<String, dynamic> e in useForStoreItems) {
+      StoreItem? storeItem = await storeItemService.getStoreItem(e["id"]);
       if (storeItem == null) continue;
 
       int index = storeItem.usedStorageItems
@@ -85,7 +85,7 @@ class StorageItemService {
 
   Future<bool> deleteStorageItem(StorageItem storageItem) async {
     try {
-      final List<String> useForStoreItems = storageItem.useForStoreItem ?? [];
+      final List<Map<String, dynamic>> useForStoreItems = storageItem.useForStoreItem ?? [];
       if (useForStoreItems.isNotEmpty) return false;
 
       await _firestore.collection(_tableName).doc(storageItem.id).delete();

@@ -16,6 +16,7 @@
   "invalidEmailOrPassword": "Email atau kata sandi tidak valid",
   "languages": "Bahasa",
   "lightDarkMode": "Mode Terang / Gelap",
+  "listItemsThatUseThisItem": "Daftar item yang menggunakan item ini",
   "login": "Masuk",
   "navigationBar": "Bar Navigasi",
   "oneStorageItemDeleted": "1 item storage dihapus",

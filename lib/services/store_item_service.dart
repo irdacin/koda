@@ -77,32 +77,40 @@ class StoreItemService {
 
     final List<StorageItem> storageItems =
         await storageItemService.getStorageItemsList();
+
     await Future.wait(storageItems.map((storageItem) async {
       final currentItems = storageItem.useForStoreItem ?? [];
-      if (currentItems.contains(storeItem.id)) {
-        final updatedItems =
-            currentItems.where((element) => element != storeItem.id).toList();
-        await storageItemService.updateStorageItem(
-          storageItem.copyWith(useForStoreItem: updatedItems),
-        );
-      }
+
+      final updatedItems = currentItems
+          .where((element) => element['id'] != storeItem.id)
+          .toList();
+
+      await storageItemService.updateStorageItem(
+        storageItem.copyWith(useForStoreItem: updatedItems),
+      );
     }).toList());
 
     await Future.wait((storeItem.usedStorageItems ?? []).map((e) async {
       StorageItem? storageItem = storageItems.cast().firstWhere(
-        (item) => item.id == e["id"],
-        orElse: () => null,
-      );
+            (item) => item.id == e["id"],
+            orElse: () => null,
+          );
 
       if (storageItem == null) return;
 
-      final currentItems = storageItem.useForStoreItem ?? [];
-      if (!currentItems.contains(storeItem.id)) {
-        final updatedItems = [...currentItems, storeItem.id!];
-        await storageItemService.updateStorageItem(
-          storageItem.copyWith(useForStoreItem: updatedItems),
-        );
+      List<Map<String, dynamic>> currentItems =
+          storageItem.useForStoreItem ?? [];
+      
+      int index = currentItems.indexWhere((item) => item['id'] == storeItem.id);
+      if (index == -1) {
+        currentItems.add({'id': storeItem.id!, 'name': storeItem.name});
+      } else {
+        currentItems[index]['name'] = storeItem.name;
       }
+      
+      await storageItemService.updateStorageItem(
+        storageItem.copyWith(useForStoreItem: currentItems),
+      );
     }).toList());
   }
 
@@ -116,13 +124,14 @@ class StoreItemService {
         if (storageItem == null) return;
 
         final currentItems = storageItem.useForStoreItem ?? [];
-        final updatedItems =
-            currentItems.where((item) => item != storeItem.id).toList();
+        final updatedItems = currentItems
+            .where((element) => element['id'] != storeItem.id)
+            .toList();
 
         await storageItemService.updateStorageItem(
           storageItem.copyWith(useForStoreItem: updatedItems.toList()),
         );
-      }).toList());
+      }));
 
       await _firestore.collection(_tableName).doc(storeItem.id).delete();
     } catch (_) {}

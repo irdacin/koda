@@ -377,12 +377,19 @@ class _AddFormStoreItemDialogState extends State<AddFormStoreItemDialog>
                                     padding: const EdgeInsets.all(8),
                                     child: Text(
                                       item.name!,
-                                      style: const TextStyle(fontSize: 12),
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: isDisabled ? AppColors.disableText : AppColors.text,
+                                      ),
                                     ),
                                   );
                           },
                           fit: FlexFit.loose,
                           showSearchBox: true,
+                          disabledItemFn: (item) {
+                            return _selectedStorageItems
+                                .any((selected) => selected['id'] == item.id);
+                          },
                           searchDelay: Duration.zero,
                           searchFieldProps: TextFieldProps(
                             decoration: InputDecoration(
@@ -679,7 +686,10 @@ class _AddFormStoreItemDialogState extends State<AddFormStoreItemDialog>
           Hero(
             tag: 'fab-icon-add',
             child: IconButton(
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () {
+                if (_isLoadingSaveIntoFirebase) return;
+                Navigator.of(context).pop();
+              },
               icon: const Icon(FontAwesomeIcons.xmark),
               iconSize: 30,
               style: IconButton.styleFrom(

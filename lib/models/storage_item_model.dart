@@ -7,7 +7,7 @@ class StorageItem {
   final double? currentWeight;
   final double? maxWeight;
   final double? percentage;
-  final List<String>? useForStoreItem;
+  final List<Map<String, dynamic>>? useForStoreItem;
   final String? unit;
   final String? description;
   final DateTime timestamp;
@@ -37,7 +37,9 @@ class StorageItem {
       maxWeight: data['maxWeight'],
       percentage: data['percentage'],
       useForStoreItem: data['useForStoreItem'] != null
-          ? List<String>.from(data['useForStoreItem'])
+          ? List<Map<String, dynamic>>.from(data['useForStoreItem'].map(
+              (item) => Map<String, dynamic>.from(item),
+            ))
           : null,
       unit: data['unit'],
       description: data['description'],
@@ -54,7 +56,9 @@ class StorageItem {
       maxWeight: data['maxWeight'],
       percentage: data['percentage'],
       useForStoreItem: data['useForStoreItem'] != null
-          ? List<String>.from(data['useForStoreItem'])
+          ? List<Map<String, dynamic>>.from(data['useForStoreItem'].map(
+              (item) => Map<String, dynamic>.from(item),
+            ))
           : null,
       unit: data['unit'],
       description: data['description'],
@@ -70,7 +74,12 @@ class StorageItem {
       'maxWeight': maxWeight,
       'percentage': percentage,
       'unit': unit,
-      'useForStoreItem': useForStoreItem,
+      'useForStoreItem': useForStoreItem?.map((item) {
+        return {
+          "id": item["id"],
+          "name": item["name"],
+        };
+      }).toList(),
       'description': description,
       'timestamp': Timestamp.fromDate(timestamp)
     };
@@ -83,7 +92,7 @@ class StorageItem {
     double? currentWeight,
     double? maxWeight,
     double? percentage,
-    List<String>? useForStoreItem,
+    List<Map<String, dynamic>>? useForStoreItem,
     String? unit,
     String? description,
     DateTime? timestamp,

@@ -16,6 +16,7 @@
   "invalidEmailOrPassword": "Invalid email or password",
   "languages": "Languages",
   "lightDarkMode": "Light / Dark Mode",
+  "listItemsThatUseThisItem": "List items that use this item",
   "login": "Login",
   "navigationBar": "Navigation Bar",
   "oneStorageItemDeleted": "1 storage item deleted",
