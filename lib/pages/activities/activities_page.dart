@@ -69,8 +69,9 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
     return AppBar(
       title: SearchBarField(
         onSearchChanged: (value) => setState(() {
-          if (value.isNotEmpty)
+          if (value.isNotEmpty) {
             value = value[0].toUpperCase() + value.substring(1);
+          }
           value = getLabelValue(context, value);
 
           _activitiesStream = _activitiesService.getActivities(
@@ -80,6 +81,7 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
           _searchText = value;
         }),
         backgroundColor: AppColors.secondary,
+        iconColor: AppColors.text,
       ),
       actions: [
         IconButton(
@@ -90,10 +92,10 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
               .then(
                 (value) => setState(() {}),
               ),
-          icon: const Icon(
+          icon: Icon(
             Icons.menu,
             size: 35,
-            color: Colors.black,
+            color: AppColors.text,
           ),
         ),
         const SizedBox(width: 10),
@@ -215,7 +217,7 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
           child: Card(
             margin: const EdgeInsets.only(left: 30, right: 30, bottom: 20),
             elevation: 15,
-            color: AppColors.main,
+            color: AppColors.background,
             shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(20),
@@ -250,7 +252,7 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                               ? getActivityValue(context, item.status!)
                                   .toUpperCase()
                               : "",
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
                           ),
@@ -263,12 +265,12 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                                 child: Row(
                                   children: [
                                     Container(
-                                      constraints: BoxConstraints(
+                                      constraints: const BoxConstraints(
                                         minWidth: 80,
                                       ),
                                       child: Text(
                                         detail["name"]!,
-                                        style: TextStyle(fontSize: 12),
+                                        style: const TextStyle(fontSize: 12),
                                       ),
                                     ),
                                     Text(
@@ -276,13 +278,13 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                                         detail['qty'].toDouble(),
                                         locale: getCurrrentLocale(context),
                                       ),
-                                      style: TextStyle(fontSize: 12),
+                                      style: const TextStyle(fontSize: 12),
                                     ),
                                     if (detail['unit'] != null) ...[
                                       const SizedBox(width: 3),
                                       Text(
                                         detail['unit'],
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           fontSize: 12,
                                         ),
                                       )
@@ -296,17 +298,17 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                           padding: const EdgeInsets.only(top: 5.0),
                           child: Text(
                             details,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 12,
                             ),
                           ),
                         )
                       else
                         Padding(
-                          padding: EdgeInsets.only(top: 5),
+                          padding: const EdgeInsets.only(top: 5),
                           child: Text(
                             "${getActivityValue(context, details["desc"])} : ${details["name"]}",
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 12,
                             ),
                           ),
@@ -326,13 +328,13 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
             children: [
               Text(
                 day,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 10,
                 ),
               ),
               Text(
                 clock,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 10,
                 ),
               ),
@@ -355,7 +357,7 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
           Positioned(
             bottom: 35,
             right: 40,
-            child: Container(
+            child: SizedBox(
               height: 25,
               child: OutlinedButton(
                 onPressed: () => _showConfirmChoseActivitiesDialog(
@@ -476,7 +478,7 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
               height: 2,
               color: AppColors.secondaryText,
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             Padding(
               padding: EdgeInsets.only(
                 left: 5,
@@ -508,7 +510,7 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
               height: 2,
               color: AppColors.secondaryText,
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             ...orderLists.map(
               (item) => Padding(
                 padding:
@@ -536,7 +538,7 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                           ),
                         ),
                         if (!isSoldStatus) ...[
-                          SizedBox(width: 3),
+                          const SizedBox(width: 3),
                           Text(
                             item["unit"],
                             style: TextStyle(
@@ -552,13 +554,13 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
               ),
             ),
             if (usedStorageItemsTotal.isNotEmpty) ...[
-              SizedBox(height: 24),
+              const SizedBox(height: 24),
               Container(
                 width: MediaQuery.of(context).size.width,
                 height: 2,
                 color: AppColors.secondaryText,
               ),
-              SizedBox(height: 12),
+              const SizedBox(height: 12),
               Text(
                 AppLocalizations.of(context)!.itemUsed,
                 style: TextStyle(
@@ -567,13 +569,13 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: 12),
+              const SizedBox(height: 12),
               Container(
                 width: MediaQuery.of(context).size.width,
                 height: 2,
                 color: AppColors.secondaryText,
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               ...usedStorageItemsTotal.values.map(
                 (item) {
                   return Padding(
@@ -601,7 +603,7 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                                 fontSize: 18,
                               ),
                             ),
-                            SizedBox(width: 3),
+                            const SizedBox(width: 3),
                             Text(
                               item['unit'],
                               style: TextStyle(

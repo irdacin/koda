@@ -216,7 +216,7 @@ class _FilterChipSectionState extends State<FilterChipSection> {
           data: Theme.of(context).copyWith(
             colorScheme: ColorScheme.light(
               primary: AppColors.selected,
-              surface: AppColors.main,
+              surface: AppColors.secondary,
               onSurface: AppColors.text,
             ),
             dividerTheme: DividerThemeData(color: AppColors.secondary),

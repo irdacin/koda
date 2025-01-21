@@ -67,20 +67,20 @@ class _SettingsPageState extends State<SettingsPage> {
                       fontSize: 25,
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   InkWell(
                     onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => NavigationBarPage(),
+                      builder: (context) => const NavigationBarPage(),
                     )),
                     child: Text(
                       AppLocalizations.of(context)!.navigationBar,
-                      style: TextStyle(fontSize: 14),
+                      style: const TextStyle(fontSize: 14),
                     ),
                   ),
-                  SizedBox(height: 50),
+                  const SizedBox(height: 50),
                   Text(
                     AppLocalizations.of(context)!.theme,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 25,
                     ),
@@ -90,20 +90,21 @@ class _SettingsPageState extends State<SettingsPage> {
                     onChanged: context.read<ThemeProvider>().toggleTheme,
                     title: Text(
                       AppLocalizations.of(context)!.lightDarkMode,
-                      style: TextStyle(fontSize: 14),
+                      style: const TextStyle(fontSize: 14),
                     ),
+                    activeColor: AppColors.selected,
                   ),
-                  SizedBox(height: 50),
+                  const SizedBox(height: 50),
                   Text(
                     AppLocalizations.of(context)!.languages,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 25,
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   ConstrainedBox(
-                    constraints: BoxConstraints(maxWidth: 200),
+                    constraints: const BoxConstraints(maxWidth: 200),
                     child: DropdownSearch<String>(
                       decoratorProps: DropDownDecoratorProps(
                         decoration: InputDecoration(
@@ -118,7 +119,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           filled: true,
                           fillColor: AppColors.secondary,
                         ),
-                        baseStyle: TextStyle(
+                        baseStyle: const TextStyle(
                           fontSize: 14,
                           overflow: TextOverflow.ellipsis,
                           fontWeight: FontWeight.bold,
@@ -160,7 +161,7 @@ class _SettingsPageState extends State<SettingsPage> {
               flex: 1,
               child: Container(
                 alignment: Alignment.bottomCenter,
-                margin: EdgeInsets.all(30),
+                margin: const EdgeInsets.all(30),
                 child: GestureDetector(
                   onTap: signOutUser,
                   child: Text(

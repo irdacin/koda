@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:koda/utils/app_colors.dart';
 
 class BottomNavBar extends StatelessWidget {
   final int currentIndex;
   final void Function(int)? onTap;
   final List<BottomNavigationBarItem> items;
+  final Color? backgroundColor;
 
   const BottomNavBar({
     super.key,
     required this.currentIndex,
     required this.items,
+    this.backgroundColor,
     this.onTap,
   });
 
@@ -35,7 +36,7 @@ class BottomNavBar extends StatelessWidget {
                   height: isSelected ? 80 : 50,
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   decoration: BoxDecoration(
-                    color: AppColors.main,
+                    color: backgroundColor,
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(15),
                       topRight: Radius.circular(15),

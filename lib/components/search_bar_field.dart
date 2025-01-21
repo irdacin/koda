@@ -4,12 +4,14 @@ class SearchBarField extends StatefulWidget {
   final ValueChanged<String>? onSearchChanged;
   final VoidCallback? onClose;
   final Color? backgroundColor;
+  final Color? iconColor;
 
   const SearchBarField({
     super.key,
     this.onSearchChanged,
     this.onClose,
     this.backgroundColor,
+    this.iconColor,
   });
 
   @override
@@ -37,10 +39,10 @@ class _SearchBarFieldState extends State<SearchBarField> {
                 },
                 icon: const Icon(Icons.cancel_outlined),
               )
-            : const Icon(
+            : Icon(
                 Icons.search,
                 size: 25,
-                color: Colors.black,
+                color: widget.iconColor,
               ),
         filled: widget.backgroundColor != null,
         fillColor: widget.backgroundColor,

@@ -127,16 +127,17 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
           _onKeyboardDismiss();
         },
         backgroundColor: AppColors.secondary,
+        iconColor: AppColors.text,
       ),
       actions: [
         IconButton(
           onPressed: () => Navigator.of(context).push(
             MaterialPageRoute(builder: (context) => const SettingsPage()),
           ),
-          icon: const Icon(
+          icon: Icon(
             Icons.menu,
             size: 35,
-            color: Colors.black,
+            color: AppColors.text,
           ),
         ),
         const SizedBox(width: 10),
@@ -253,7 +254,7 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
           child: Icon(
             _isEdit ? FontAwesomeIcons.check : FontAwesomeIcons.penToSquare,
             size: 25,
-            color: _isEdit ? Colors.white : Colors.black,
+            color: _isEdit ? Colors.white : AppColors.text,
           ),
         ),
         const SizedBox(height: 15),
@@ -270,7 +271,7 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
             child: Icon(
               _isEdit ? FontAwesomeIcons.xmark : FontAwesomeIcons.plus,
               size: 25,
-              color: _isEdit ? Colors.white : Colors.black,
+              color: _isEdit ? Colors.white : AppColors.text,
             ),
           ),
         ),
@@ -322,9 +323,10 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
                       height: 100,
                       decoration: BoxDecoration(
                         image: DecorationImage(
-                            image: imageProvider,
-                            opacity: 0.75,
-                            fit: BoxFit.cover),
+                          image: imageProvider,
+                          opacity: 0.75,
+                          fit: BoxFit.cover,
+                        ),
                         color: AppColors.secondary,
                         borderRadius: BorderRadius.circular(15),
                       ),
@@ -353,12 +355,12 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
                 ),
                 onPressed: () => _showFormItemDialog(item: item),
                 icon: const Icon(Icons.edit),
-                color: AppColors.main,
+                color: Colors.white,
               ),
             )
           ],
         ),
-        SizedBox(width: 5),
+        const SizedBox(width: 5),
         Expanded(
           child: GestureDetector(
             onTap: useForStoreItem.isEmpty
@@ -529,10 +531,10 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
                         ),
                       ),
                     ),
-                    SizedBox(height: 5),
+                    const SizedBox(height: 5),
                     ...useForStoreItem.map(
                       (storeItem) => Container(
-                        padding: EdgeInsets.symmetric(
+                        padding: const EdgeInsets.symmetric(
                           horizontal: 10,
                           vertical: 3,
                         ),
@@ -541,7 +543,7 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
                           border: Border.all(color: AppColors.secondary),
                           borderRadius: BorderRadius.circular(5),
                         ),
-                        margin: EdgeInsets.only(bottom: 5),
+                        margin: const EdgeInsets.only(bottom: 5),
                         child: Text(
                           storeItem['name'],
                           style: const TextStyle(fontSize: 12),
@@ -649,13 +651,13 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 18),
+            const SizedBox(height: 18),
             Container(
               width: MediaQuery.of(context).size.width,
               height: 2,
               color: AppColors.secondaryText,
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             Padding(
               padding: const EdgeInsets.only(left: 5, right: 20),
               child: Row(
@@ -678,13 +680,13 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
                 ],
               ),
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             Container(
               width: MediaQuery.of(context).size.width,
               height: 2,
               color: AppColors.secondaryText,
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             ...updatedLists.map(
               (item) => Padding(
                 padding:
@@ -711,7 +713,7 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
                             fontSize: 18,
                           ),
                         ),
-                        SizedBox(width: 3),
+                        const SizedBox(width: 3),
                         Text(
                           item['unit'],
                           style: TextStyle(

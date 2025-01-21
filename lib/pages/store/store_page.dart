@@ -59,6 +59,7 @@ class _StorePageState extends State<StorePage> with WidgetsBindingObserver {
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _storeActivities.clear();
+    _onKeyboardDismiss();
     super.dispose();
   }
 
@@ -138,16 +139,17 @@ class _StorePageState extends State<StorePage> with WidgetsBindingObserver {
           _onKeyboardDismiss();
         },
         backgroundColor: AppColors.secondary,
+        iconColor: AppColors.text,
       ),
       actions: [
         IconButton(
           onPressed: () => Navigator.of(context).push(
             MaterialPageRoute(builder: (context) => const SettingsPage()),
           ),
-          icon: const Icon(
+          icon: Icon(
             Icons.menu,
             size: 35,
-            color: Colors.black,
+            color: AppColors.text,
           ),
         ),
         const SizedBox(width: 10),
@@ -265,7 +267,7 @@ class _StorePageState extends State<StorePage> with WidgetsBindingObserver {
           child: Icon(
             _isEdit ? FontAwesomeIcons.check : FontAwesomeIcons.penToSquare,
             size: 25,
-            color: _isEdit ? Colors.white : Colors.black,
+            color: _isEdit ? Colors.white : AppColors.text,
           ),
         ),
         const SizedBox(height: 15),
@@ -282,7 +284,7 @@ class _StorePageState extends State<StorePage> with WidgetsBindingObserver {
             child: Icon(
               _isEdit ? FontAwesomeIcons.xmark : FontAwesomeIcons.plus,
               size: 25,
-              color: _isEdit ? Colors.white : Colors.black,
+              color: _isEdit ? Colors.white : AppColors.text,
             ),
           ),
         ),
@@ -330,7 +332,10 @@ class _StorePageState extends State<StorePage> with WidgetsBindingObserver {
                         width: constraints.maxWidth,
                         height: constraints.maxWidth,
                         decoration: BoxDecoration(
-                          color: const Color(0xffababab),
+                          color:
+                              Theme.of(context).brightness == Brightness.light
+                                  ? const Color(0xffababab)
+                                  : AppColors.darkMain,
                           borderRadius: BorderRadius.circular(15),
                         ),
                         padding: const EdgeInsets.all(15),
@@ -399,7 +404,7 @@ class _StorePageState extends State<StorePage> with WidgetsBindingObserver {
                             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           ),
                           onPressed: () => _showFormItemDialog(item: item),
-                          color: AppColors.main,
+                          color: Colors.white,
                           icon: const Icon(Icons.edit),
                         ),
                 ),
@@ -443,28 +448,28 @@ class _StorePageState extends State<StorePage> with WidgetsBindingObserver {
                       ),
                       Text(
                         _storeActivities[item.id]?["qty"].toString() ?? "0",
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       IconButton(
                         onPressed: () {
-                                setState(() {
-                                  _storeActivities.update(
-                                    item.id!,
-                                    (value) {
-                                      value["qty"]++;
-                                      return value;
-                                    },
-                                    ifAbsent: () => {
-                                      "name": item.name,
-                                      "qty": 1,
-                                      "usedStorageItem": item.usedStorageItems,
-                                    },
-                                  );
-                                });
+                          setState(() {
+                            _storeActivities.update(
+                              item.id!,
+                              (value) {
+                                value["qty"]++;
+                                return value;
                               },
+                              ifAbsent: () => {
+                                "name": item.name,
+                                "qty": 1,
+                                "usedStorageItem": item.usedStorageItems,
+                              },
+                            );
+                          });
+                        },
                         icon: const Icon(Icons.add),
                       ),
                     ],
@@ -543,14 +548,14 @@ class _StorePageState extends State<StorePage> with WidgetsBindingObserver {
           child: Container(
             alignment: Alignment.bottomCenter,
             decoration: BoxDecoration(
-              color: AppColors.main.withAlpha(125),
+              color: Colors.white.withAlpha(125),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Icon(
               isShowDescription
                   ? Icons.keyboard_arrow_up_sharp
                   : Icons.keyboard_arrow_down_sharp,
-              color: AppColors.main,
+              color: Colors.white,
             ),
           ),
         )
@@ -644,13 +649,13 @@ class _StorePageState extends State<StorePage> with WidgetsBindingObserver {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 18),
+            const SizedBox(height: 18),
             Container(
               width: MediaQuery.of(context).size.width,
               height: 2,
               color: AppColors.secondaryText,
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 5),
               child: Row(
@@ -673,13 +678,13 @@ class _StorePageState extends State<StorePage> with WidgetsBindingObserver {
                 ],
               ),
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             Container(
               width: MediaQuery.of(context).size.width,
               height: 2,
               color: AppColors.secondaryText,
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             ...orderLists.map(
               (item) => Padding(
                 padding:
@@ -705,13 +710,13 @@ class _StorePageState extends State<StorePage> with WidgetsBindingObserver {
                 ),
               ),
             ),
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
             Container(
               width: MediaQuery.of(context).size.width,
               height: 2,
               color: AppColors.secondaryText,
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             Text(
               AppLocalizations.of(context)!.itemUsed,
               style: TextStyle(
@@ -720,13 +725,13 @@ class _StorePageState extends State<StorePage> with WidgetsBindingObserver {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             Container(
               width: MediaQuery.of(context).size.width,
               height: 2,
               color: AppColors.secondaryText,
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             ..._usedStorageItemsTotal.values.map(
               (item) {
                 return Padding(
@@ -754,7 +759,7 @@ class _StorePageState extends State<StorePage> with WidgetsBindingObserver {
                               fontSize: 18,
                             ),
                           ),
-                          SizedBox(width: 3),
+                          const SizedBox(width: 3),
                           Text(
                             item['unit'],
                             style: TextStyle(

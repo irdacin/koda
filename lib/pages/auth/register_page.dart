@@ -99,7 +99,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 Center(
                   child: Text(
                     AppLocalizations.of(context)!.register.toUpperCase(),
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 30,
                     ),

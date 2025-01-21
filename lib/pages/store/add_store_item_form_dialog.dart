@@ -683,7 +683,7 @@ class _AddFormStoreItemDialogState extends State<AddFormStoreItemDialog>
                 navigator.pop();
               },
               style: ElevatedButton.styleFrom(
-                foregroundColor: AppColors.main,
+                foregroundColor: Colors.white,
                 backgroundColor: AppColors.selected,
                 padding: const EdgeInsets.all(10),
                 shape: RoundedRectangleBorder(

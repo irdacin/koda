@@ -4,6 +4,8 @@ import 'package:koda/pages/activities/activities_page.dart';
 import 'package:koda/pages/storage/storage_page.dart';
 import 'package:koda/pages/store/store_page.dart';
 import 'package:koda/providers/navigation_bar_provider.dart';
+import 'package:koda/providers/theme_provider.dart';
+import 'package:koda/utils/app_colors.dart';
 import 'package:provider/provider.dart';
 
 class MainPage extends StatefulWidget {
@@ -35,6 +37,7 @@ class _MainPageState extends State<MainPage> {
               right: 10,
               child: BottomNavBar(
                 currentIndex: index,
+                backgroundColor: Provider.of<ThemeProvider>(context).themeMode == ThemeMode.light ? AppColors.background : AppColors.background,
                 items: [
                   BottomNavigationBarItem(
                     icon: const Icon(Icons.store),

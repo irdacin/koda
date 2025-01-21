@@ -42,8 +42,8 @@ class _EditStoreFormItemDialogState extends State<EditStoreFormItemDialog>
 
   final StoreItemService _storeItemService = StoreItemService();
   final ActivitiesService _activitiesService = ActivitiesService();
+  final List<Map<String, dynamic>> _addSelectedStorageItems = [];
   List<Map<String, dynamic>> _selectedStorageItems = [];
-  List<Map<String, dynamic>> _addSelectedStorageItems = [];
   bool _isLoadingLoadImage = false;
   bool _isLoadingSaveIntoFirebase = false;
 
@@ -718,7 +718,7 @@ class _EditStoreFormItemDialogState extends State<EditStoreFormItemDialog>
                 Navigator.of(context).pop();
               },
               style: ElevatedButton.styleFrom(
-                foregroundColor: AppColors.main,
+                foregroundColor: Colors.white,
                 backgroundColor: AppColors.selected,
                 padding: const EdgeInsets.all(10),
                 shape: RoundedRectangleBorder(

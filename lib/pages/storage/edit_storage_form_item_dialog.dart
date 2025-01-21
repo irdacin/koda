@@ -500,7 +500,7 @@ class _EditStorageFormItemDialogState extends State<EditStorageFormItemDialog>
                 Navigator.of(context).pop();
               },
               style: ElevatedButton.styleFrom(
-                foregroundColor: AppColors.main,
+                foregroundColor: Colors.white,
                 backgroundColor: AppColors.selected,
                 padding: const EdgeInsets.all(10),
                 shape: RoundedRectangleBorder(

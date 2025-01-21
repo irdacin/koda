@@ -63,7 +63,7 @@ class _LoginPageState extends State<LoginPage> {
                 Center(
                   child: Text(
                     AppLocalizations.of(context)!.login.toUpperCase(),
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 30,
                     ),
