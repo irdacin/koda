@@ -15,7 +15,7 @@ class AppColors {
   static Color lightDisableText = const Color(0xffb3b3b3);
   static Color darkDisableText = const Color(0xff6b6b6b);
   static Color selected = const Color(0xff0095ff);
-  static Color lightBackground = const Color(0xfff0f0f0);
+  static Color lightBackground = const Color(0xffffffff);
   static Color darkBackground = const Color(0xff2c2c2c);
 
   static Color get background => _isDarkMode ? darkBackground : lightBackground;

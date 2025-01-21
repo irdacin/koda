@@ -6,6 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:koda/helpers/format_number.dart';
+import 'package:koda/helpers/get_current_locale.dart';
+import 'package:koda/models/activity_model.dart';
+import 'package:koda/services/activities_service.dart';
 import 'package:koda/utils/app_colors.dart';
 import 'package:koda/models/storage_item_model.dart';
 import 'package:koda/models/store_item_model.dart';
@@ -27,7 +31,7 @@ class _EditStoreFormItemDialogState extends State<EditStoreFormItemDialog>
     with WidgetsBindingObserver {
   bool _isKeyboardOpen = false;
   bool _isExpand = false;
-  List<StorageItem> storageItems = [];
+  List<StorageItem> _storageItems = [];
 
   Uint8List? image;
   final TextEditingController nameController = TextEditingController();
@@ -37,8 +41,9 @@ class _EditStoreFormItemDialogState extends State<EditStoreFormItemDialog>
   final TextEditingController descriptionController = TextEditingController();
 
   final StoreItemService _storeItemService = StoreItemService();
-  final StorageItemService _storageItemService = StorageItemService();
+  final ActivitiesService _activitiesService = ActivitiesService();
   List<Map<String, dynamic>> _selectedStorageItems = [];
+  List<Map<String, dynamic>> _addSelectedStorageItems = [];
   bool _isLoadingLoadImage = false;
   bool _isLoadingSaveIntoFirebase = false;
 
@@ -57,7 +62,7 @@ class _EditStoreFormItemDialogState extends State<EditStoreFormItemDialog>
     nameController.text = widget.item.name ?? "";
     categoryController.text = widget.item.category ?? "";
     descriptionController.text = widget.item.description ?? "";
-    storageItems = await _storageItemService.getStorageItemsList();
+    _storageItems = await StorageItemService().getStorageItemsList();
     _selectedStorageItems = widget.item.usedStorageItems ?? [];
     if (_selectedStorageItems.isNotEmpty) _isExpand = true;
 
@@ -75,6 +80,7 @@ class _EditStoreFormItemDialogState extends State<EditStoreFormItemDialog>
     categoryController.dispose();
     quantityController.dispose();
     descriptionController.dispose();
+    _addSelectedStorageItems.clear();
     super.dispose();
   }
 
@@ -247,8 +253,8 @@ class _EditStoreFormItemDialogState extends State<EditStoreFormItemDialog>
                   decoration: BoxDecoration(
                     image: DecorationImage(
                       image: MemoryImage(image!),
-                      fit: BoxFit.cover,
                     ),
+                    color: AppColors.main,
                     borderRadius: BorderRadius.circular(5),
                   ),
                 ),
@@ -388,7 +394,7 @@ class _EditStoreFormItemDialogState extends State<EditStoreFormItemDialog>
                             fillColor: AppColors.main,
                           ),
                         ),
-                        items: (filter, infiniteScrollProps) => storageItems,
+                        items: (filter, infiniteScrollProps) => _storageItems,
                         suffixProps: const DropdownSuffixProps(
                           dropdownButtonProps: DropdownButtonProps(
                             padding: EdgeInsets.zero,
@@ -417,7 +423,8 @@ class _EditStoreFormItemDialogState extends State<EditStoreFormItemDialog>
                                   );
                           },
                           disabledItemFn: (item) {
-                            return _selectedStorageItems
+                            return (_selectedStorageItems +
+                                    _addSelectedStorageItems)
                                 .any((selected) => selected['id'] == item.id);
                           },
                           fit: FlexFit.loose,
@@ -504,7 +511,7 @@ class _EditStoreFormItemDialogState extends State<EditStoreFormItemDialog>
                     onPressed: () {
                       if (_storageItem == null) return;
 
-                      _selectedStorageItems.add({
+                      _addSelectedStorageItems.add({
                         "id": _storageItem?.id,
                         "image": _storageItem?.image,
                         "name": _storageItem?.name,
@@ -576,7 +583,9 @@ class _EditStoreFormItemDialogState extends State<EditStoreFormItemDialog>
   }
 
   List<Widget> _buildSelectedStorageItem() {
-    return _selectedStorageItems.map(
+    final currentSelectedStorageItems =
+        _selectedStorageItems + _addSelectedStorageItems;
+    return currentSelectedStorageItems.map(
       (e) {
         String? image = e["image"];
         String? name = e["name"];
@@ -627,7 +636,12 @@ class _EditStoreFormItemDialogState extends State<EditStoreFormItemDialog>
               Text(name ?? ""),
               Row(
                 children: [
-                  Text("${quantity?.toInt()}"),
+                  Text(
+                    formatNumber(
+                      quantity ?? 0,
+                      locale: getCurrrentLocale(context),
+                    ),
+                  ),
                   const SizedBox(width: 5),
                   Text(unit ?? ""),
                 ],
@@ -676,8 +690,7 @@ class _EditStoreFormItemDialogState extends State<EditStoreFormItemDialog>
               onPressed: () async {
                 if (_isLoadingSaveIntoFirebase) return;
                 setState(() => _isLoadingSaveIntoFirebase = true);
-
-                final navigator = Navigator.of(context);
+                _selectedStorageItems.addAll(_addSelectedStorageItems);
 
                 StoreItem newItem = widget.item.copyWith(
                   image: image != null
@@ -691,8 +704,18 @@ class _EditStoreFormItemDialogState extends State<EditStoreFormItemDialog>
                 await _storeItemService.updateStoreItem(newItem);
                 await _storeItemService.updateToStorageItem(newItem);
 
+                Activity activity = Activity(
+                  status: "Edit",
+                  details: {
+                    "name": nameController.text,
+                    "desc": "Edited Store Item",
+                  },
+                );
+                await _activitiesService.createActivities(activity);
+
                 setState(() => _isLoadingSaveIntoFirebase = false);
-                navigator.pop();
+                if (!context.mounted) return;
+                Navigator.of(context).pop();
               },
               style: ElevatedButton.styleFrom(
                 foregroundColor: AppColors.main,

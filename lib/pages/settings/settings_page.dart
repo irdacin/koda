@@ -62,7 +62,10 @@ class _SettingsPageState extends State<SettingsPage> {
                 children: [
                   Text(
                     AppLocalizations.of(context)!.customize,
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 25,
+                    ),
                   ),
                   SizedBox(height: 20),
                   InkWell(
@@ -71,7 +74,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     )),
                     child: Text(
                       AppLocalizations.of(context)!.navigationBar,
-                      style: TextStyle(fontSize: 16),
+                      style: TextStyle(fontSize: 14),
                     ),
                   ),
                   SizedBox(height: 50),
@@ -79,20 +82,23 @@ class _SettingsPageState extends State<SettingsPage> {
                     AppLocalizations.of(context)!.theme,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 30,
+                      fontSize: 25,
                     ),
                   ),
                   SwitchListTile(
                     value: Theme.of(context).brightness == Brightness.dark,
                     onChanged: context.read<ThemeProvider>().toggleTheme,
-                    title: Text(AppLocalizations.of(context)!.lightDarkMode),
+                    title: Text(
+                      AppLocalizations.of(context)!.lightDarkMode,
+                      style: TextStyle(fontSize: 14),
+                    ),
                   ),
                   SizedBox(height: 50),
                   Text(
                     AppLocalizations.of(context)!.languages,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 30,
+                      fontSize: 25,
                     ),
                   ),
                   SizedBox(height: 20),
@@ -102,23 +108,27 @@ class _SettingsPageState extends State<SettingsPage> {
                       decoratorProps: DropDownDecoratorProps(
                         decoration: InputDecoration(
                           border: const OutlineInputBorder(
-                              borderSide: BorderSide.none,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15))),
+                            borderSide: BorderSide.none,
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(15),
+                            ),
+                          ),
                           contentPadding:
                               const EdgeInsets.symmetric(horizontal: 15),
                           filled: true,
                           fillColor: AppColors.secondary,
                         ),
                         baseStyle: TextStyle(
-                          fontSize: 16,
+                          fontSize: 14,
                           overflow: TextOverflow.ellipsis,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      selectedItem: getLanguage(context,
-                          context.read<LanguageProvider>().languageCode!),
-                      suffixProps: DropdownSuffixProps(
+                      selectedItem: getLanguage(
+                        context,
+                        context.read<LanguageProvider>().languageCode!,
+                      ),
+                      suffixProps: const DropdownSuffixProps(
                         dropdownButtonProps: DropdownButtonProps(
                           padding: EdgeInsets.zero,
                           iconClosed: Icon(Icons.keyboard_arrow_down),
@@ -155,7 +165,10 @@ class _SettingsPageState extends State<SettingsPage> {
                   onTap: signOutUser,
                   child: Text(
                     AppLocalizations.of(context)!.signOut,
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 25,
+                    ),
                   ),
                 ),
               ),

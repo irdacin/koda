@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:koda/models/activity_model.dart';
+import 'package:koda/services/activities_service.dart';
 import 'package:koda/utils/app_colors.dart';
 import 'package:koda/models/storage_item_model.dart';
 import 'package:koda/services/image_service.dart';
@@ -37,6 +39,7 @@ class _AddStorageFormItemDialogState extends State<AddStorageFormItemDialog>
   bool _isKeyboardOpen = false;
   bool _isLoadingSaveIntoFirebase = false;
   final StorageItemService _storageItemService = StorageItemService();
+  final ActivitiesService _activitiesService = ActivitiesService();
 
   @override
   void initState() {
@@ -202,8 +205,8 @@ class _AddStorageFormItemDialogState extends State<AddStorageFormItemDialog>
             : BoxDecoration(
                 image: DecorationImage(
                   image: MemoryImage(_image!),
-                  fit: BoxFit.cover,
                 ),
+                color: AppColors.main,
               ),
         alignment: Alignment.center,
         child: _image == null
@@ -422,8 +425,6 @@ class _AddStorageFormItemDialogState extends State<AddStorageFormItemDialog>
                 if (_isLoadingSaveIntoFirebase) return;
                 setState(() => _isLoadingSaveIntoFirebase = true);
 
-                final navigator = Navigator.of(context);
-
                 StorageItem storageItem = StorageItem(
                   image: _image != null
                       ? await ImageService.uploadImage(_image!)
@@ -436,8 +437,19 @@ class _AddStorageFormItemDialogState extends State<AddStorageFormItemDialog>
                 );
                 await _storageItemService.createStorageItem(storageItem);
 
+                Activity activity = Activity(
+                  status: "Add",
+                  details: {
+                    "name": nameController.text,
+                    "desc": "Edited Storage Item",
+                  },
+                );
+                await _activitiesService.createActivities(activity);
+
                 setState(() => _isLoadingSaveIntoFirebase = false);
-                navigator.pop();
+
+                if (!context.mounted) return;
+                Navigator.of(context).pop();
               },
               style: ElevatedButton.styleFrom(
                 foregroundColor: AppColors.main,

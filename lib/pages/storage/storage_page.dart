@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -5,6 +6,10 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:koda/components/filter_chip_section.dart';
 import 'package:koda/components/search_bar_field.dart';
+import 'package:koda/helpers/format_number.dart';
+import 'package:koda/helpers/get_current_locale.dart';
+import 'package:koda/models/activity_model.dart';
+import 'package:koda/services/activities_service.dart';
 import 'package:koda/utils/app_colors.dart';
 import 'package:koda/helpers/localization_mapper.dart';
 import 'package:koda/models/storage_item_model.dart';
@@ -22,16 +27,18 @@ class StoragePage extends StatefulWidget {
 
 class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
   String _searchText = "";
+  int _indexDelete = -1;
   bool _isEdit = false;
   bool _openDialog = false;
-  int _indexDelete = -1;
   bool _isKeyboardOpen = false;
+  bool _isLoadingSaveIntoFirebase = false;
   int _indexShowTheStoreUsed = -1;
   String _selectedChipLabel = "all";
 
-  Map<int, int> quantity = {};
   final StorageItemService _storageItemService = StorageItemService();
-  final Map<int, TextEditingController> itemControllers = {};
+  final ActivitiesService _activitiesService = ActivitiesService();
+  final Map<String, TextEditingController> itemControllers = {};
+  final Map<String, Map<String, dynamic>> _storageActivities = {};
   late Stream<List<StorageItem>> _storageItemStream;
 
   @override
@@ -45,6 +52,8 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    itemControllers.clear();
+    _storageActivities.clear();
     super.dispose();
   }
 
@@ -159,7 +168,7 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
         Text(AppLocalizations.of(context)!.empty),
       ],
       onSelected: (value) {
-        value = getMappedValue(context, value);
+        value = getLabelValue(context, value);
         setState(() => _selectedChipLabel = value);
         _storageItemStream = _storageItemService.getStorageItems(
           searchField: _searchText,
@@ -175,57 +184,57 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
   Widget _buildStorageLists() {
     return Expanded(
       child: StreamBuilder(
-          stream: _storageItemStream,
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              return const Center(
-                child: Text("Error"),
-              );
-            }
+        stream: _storageItemStream,
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return const Center(
+              child: Text("Error"),
+            );
+          }
 
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: CircularProgressIndicator(
-                  color: Colors.blue,
-                ),
-              );
-            }
-
-            if (snapshot.data == null) {
-              return Container();
-            }
-
-            return SlidableAutoCloseBehavior(
-              child: ListView.separated(
-                separatorBuilder: (context, index) =>
-                    const SizedBox(height: 20),
-                itemCount: snapshot.data!.length,
-                padding: const EdgeInsets.only(bottom: 250),
-                itemBuilder: (context, index) {
-                  StorageItem storageItem = snapshot.data![index];
-                  return Slidable(
-                    endActionPane: ActionPane(
-                      motion: const BehindMotion(),
-                      extentRatio: 0.3,
-                      children: [
-                        SlidableAction(
-                          onPressed: (context) => _deleteItem(storageItem),
-                          backgroundColor: Colors.red,
-                          foregroundColor: Colors.white,
-                          borderRadius: BorderRadius.circular(5),
-                          label: AppLocalizations.of(context)!.delete,
-                        ),
-                      ],
-                    ),
-                    child: _buildStorageItem(
-                      index: index,
-                      item: storageItem,
-                    ),
-                  );
-                },
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(
+                color: Colors.blue,
               ),
             );
-          }),
+          }
+
+          if (snapshot.data == null) {
+            return Container();
+          }
+
+          return SlidableAutoCloseBehavior(
+            child: ListView.separated(
+              separatorBuilder: (context, index) => const SizedBox(height: 20),
+              itemCount: snapshot.data!.length,
+              padding: const EdgeInsets.only(bottom: 250),
+              itemBuilder: (context, index) {
+                StorageItem storageItem = snapshot.data![index];
+                return Slidable(
+                  endActionPane: ActionPane(
+                    motion: const BehindMotion(),
+                    extentRatio: 0.3,
+                    children: [
+                      SlidableAction(
+                        onPressed: (context) => _deleteItem(storageItem),
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
+                        borderRadius: BorderRadius.circular(5),
+                        label: AppLocalizations.of(context)!.delete,
+                      ),
+                    ],
+                  ),
+                  child: _buildStorageItem(
+                    index: index,
+                    item: storageItem,
+                  ),
+                );
+              },
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -235,9 +244,8 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
       children: [
         FloatingActionButton(
           backgroundColor: _isEdit ? AppColors.selected : AppColors.secondary,
-          onPressed: () {
-            setState(() => _isEdit ^= true);
-          },
+          onPressed:
+              _isEdit ? _showConfirmChoseActivitiesDialog : _openEditItem,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
@@ -270,7 +278,13 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
     );
   }
 
+  void _openEditItem() {
+    setState(() => _isEdit = true);
+  }
+
   void _closeEditItem() {
+    _storageActivities.clear();
+    itemControllers.clear();
     setState(() => _isEdit = false);
   }
 
@@ -308,10 +322,9 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
                       height: 100,
                       decoration: BoxDecoration(
                         image: DecorationImage(
-                          image: imageProvider,
-                          // fit: BoxFit.cover,
-                          opacity: 0.75,
-                        ),
+                            image: imageProvider,
+                            opacity: 0.75,
+                            fit: BoxFit.cover),
                         color: AppColors.secondary,
                         borderRadius: BorderRadius.circular(15),
                       ),
@@ -395,14 +408,26 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
                               border: Border.all(color: AppColors.secondary)),
                           child: TextField(
                             controller: itemControllers.putIfAbsent(
-                                index,
+                                item.id!,
                                 () => TextEditingController(
-                                      text: quantity.containsKey(index)
-                                          ? quantity[index].toString()
+                                      text: _storageActivities
+                                              .containsKey(item.id!)
+                                          ? _storageActivities[item.id]!["qty"]
                                           : "0",
                                     )),
                             onChanged: (value) {
-                              quantity[index] = int.parse(value);
+                              _storageActivities.update(
+                                item.id!,
+                                (entry) {
+                                  entry["qty"] = double.tryParse(value);
+                                  return entry;
+                                },
+                                ifAbsent: () => {
+                                  "name": item.name,
+                                  "qty": double.tryParse(value),
+                                  "unit": item.unit,
+                                },
+                              );
                             },
                             textAlign: TextAlign.end,
                             keyboardType: TextInputType.number,
@@ -483,11 +508,11 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          '${currentWeight.toInt()} $unit',
+                          '${formatNumber(currentWeight, locale: getCurrrentLocale(context))} $unit',
                           style: const TextStyle(fontSize: 12),
                         ),
                         Text(
-                          '${maxWeight.toInt()} $unit',
+                          '${formatNumber(maxWeight, locale: getCurrrentLocale(context))} $unit',
                           style: const TextStyle(fontSize: 12),
                         ),
                       ],
@@ -533,9 +558,8 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
     );
   }
 
-  void _showFormItemDialog({
-    StorageItem? item,
-  }) async {
+  void _showFormItemDialog({StorageItem? item}) async {
+    if (_isEdit) _closeEditItem();
     setState(() => _openDialog = true);
     await showDialog(
       context: context,
@@ -563,7 +587,231 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
     );
   }
 
+  void _showConfirmChoseActivitiesDialog() async {
+    setState(() => _openDialog = true);
+    bool isConfirmed = await showDialog(
+      context: context,
+      builder: (context) {
+        return BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Dialog(
+            insetPadding: const EdgeInsets.only(
+              left: 15,
+              right: 15,
+              top: 60,
+              bottom: 169,
+            ),
+            elevation: 10,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            backgroundColor: AppColors.selected,
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
+              child: Stack(
+                children: [
+                  _buildChoseOrderLists(context),
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: _buildButtomDialogButton(context),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+
+    if (isConfirmed) {
+      _closeEditItem();
+    }
+    setState(() => _openDialog = true);
+  }
+
+  Widget _buildChoseOrderLists(BuildContext context) {
+    final List<Map<String, dynamic>> updatedLists =
+        _storageActivities.values.where((entry) => entry["qty"] != 0).toList();
+
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(40, 40, 40, 65),
+        child: Column(
+          children: [
+            Text(
+              AppLocalizations.of(context)!.updatedLists,
+              style: TextStyle(
+                color: AppColors.secondaryText,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 18),
+            Container(
+              width: MediaQuery.of(context).size.width,
+              height: 2,
+              color: AppColors.secondaryText,
+            ),
+            SizedBox(height: 12),
+            Padding(
+              padding: const EdgeInsets.only(left: 5, right: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    AppLocalizations.of(context)!.itemName,
+                    style: TextStyle(
+                      color: AppColors.secondaryText,
+                      fontSize: 18,
+                    ),
+                  ),
+                  Text(
+                    AppLocalizations.of(context)!.qty,
+                    style: TextStyle(
+                      color: AppColors.secondaryText,
+                      fontSize: 18,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 12),
+            Container(
+              width: MediaQuery.of(context).size.width,
+              height: 2,
+              color: AppColors.secondaryText,
+            ),
+            SizedBox(height: 8),
+            ...updatedLists.map(
+              (item) => Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      item['name'],
+                      style: TextStyle(
+                        color: AppColors.secondaryText,
+                        fontSize: 18,
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          formatNumber(
+                            item['qty'],
+                            locale: getCurrrentLocale(context),
+                          ),
+                          style: TextStyle(
+                            color: AppColors.secondaryText,
+                            fontSize: 18,
+                          ),
+                        ),
+                        SizedBox(width: 3),
+                        Text(
+                          item['unit'],
+                          style: TextStyle(
+                            color: AppColors.secondaryText,
+                            fontSize: 18,
+                          ),
+                        )
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildButtomDialogButton(BuildContext context) {
+    return Container(
+      height: 60,
+      padding: const EdgeInsets.only(left: 20, right: 4),
+      decoration: BoxDecoration(
+        color: AppColors.selected,
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(10),
+          bottomRight: Radius.circular(10),
+        ),
+      ),
+      alignment: Alignment.center,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          InkWell(
+            onTap: () {
+              if (_isLoadingSaveIntoFirebase) return;
+              Navigator.pop(context, false);
+            },
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.arrow_back_ios,
+                  color: AppColors.secondaryText,
+                  size: 25,
+                ),
+                Text(
+                  AppLocalizations.of(context)!.back,
+                  style: TextStyle(
+                    color: AppColors.secondaryText,
+                    fontSize: 16,
+                  ),
+                )
+              ],
+            ),
+          ),
+          IconButton(
+            onPressed: () async {
+              if (_isLoadingSaveIntoFirebase) return;
+              setState(() => _isLoadingSaveIntoFirebase = true);
+
+              Activity activity = Activity(
+                status: "In",
+                details: _storageActivities.values
+                    .where((entry) => entry["qty"] != 0)
+                    .toList(),
+              );
+              _activitiesService.createActivities(activity);
+
+              for (var entry in _storageActivities.entries) {
+                StorageItem? item =
+                    await _storageItemService.getStorageItem(entry.key);
+                await _storageItemService.updateStorageItem(item!.copyWith(
+                  currentWeight: item.currentWeight! + entry.value["qty"],
+                ));
+              }
+
+              setState(() => _isLoadingSaveIntoFirebase = false);
+
+              if (!context.mounted) return;
+              Navigator.pop(context, true);
+            },
+            constraints: const BoxConstraints(),
+            icon: const Icon(FontAwesomeIcons.check),
+            iconSize: 25,
+            style: IconButton.styleFrom(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+            color: AppColors.secondaryText,
+          ),
+        ],
+      ),
+    );
+  }
+
   void _deleteItem(StorageItem item) async {
+    if (_isEdit) _closeEditItem();
     setState(() => _indexDelete = -1);
     final snackbar = ScaffoldMessenger.of(context);
     snackbar.removeCurrentSnackBar();
@@ -573,6 +821,15 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
       _showCannotDeleteDialog();
       return;
     }
+
+    final Activity activity = Activity(
+      status: "Delete",
+      details: {
+        "name": item.name,
+        "desc": "Deleted Storage Item",
+      },
+    );
+    await _activitiesService.createActivities(activity);
 
     if (!mounted) return;
 
@@ -590,7 +847,10 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
       action: SnackBarAction(
         label: AppLocalizations.of(context)!.undo,
         textColor: AppColors.selected,
-        onPressed: () => _storageItemService.undoDeleteItem(item),
+        onPressed: () {
+          _storageItemService.undoDeleteItem(item);
+          _activitiesService.deleteActivity(activity);
+        },
       ),
     ));
   }

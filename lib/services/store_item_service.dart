@@ -12,7 +12,7 @@ class StoreItemService {
       await updateToStorageItem(storeItem);
       await _firestore
           .collection(_tableName)
-          .doc()
+          .doc(storeItem.id)
           .set(storeItem.toFirestore());
     } catch (_) {}
   }

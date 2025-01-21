@@ -6,6 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:koda/helpers/format_number.dart';
+import 'package:koda/helpers/get_current_locale.dart';
+import 'package:koda/models/activity_model.dart';
+import 'package:koda/services/activities_service.dart';
 import 'package:koda/utils/app_colors.dart';
 import 'package:koda/models/storage_item_model.dart';
 import 'package:koda/models/store_item_model.dart';
@@ -26,7 +30,7 @@ class _AddFormStoreItemDialogState extends State<AddFormStoreItemDialog>
   bool _isKeyboardOpen = false;
   bool _isExpand = false;
   bool _isLoadingSaveIntoFirebase = false;
-  List<StorageItem> storageItems = [];
+  List<StorageItem> _storageItems = [];
   StorageItem? _storageItem;
   String _selectedStorageUnit = "kg";
 
@@ -38,6 +42,7 @@ class _AddFormStoreItemDialogState extends State<AddFormStoreItemDialog>
   final TextEditingController descriptionController = TextEditingController();
 
   final StoreItemService _storeItemService = StoreItemService();
+  final ActivitiesService _activitiesService = ActivitiesService();
   final List<Map<String, dynamic>> _selectedStorageItems = [];
 
   @override
@@ -49,7 +54,7 @@ class _AddFormStoreItemDialogState extends State<AddFormStoreItemDialog>
   }
 
   void _initilizeForm() async {
-    storageItems = await StorageItemService().getStorageItemsList();
+    _storageItems = await StorageItemService().getStorageItemsList();
   }
 
   @override
@@ -357,7 +362,7 @@ class _AddFormStoreItemDialogState extends State<AddFormStoreItemDialog>
                             fillColor: AppColors.main,
                           ),
                         ),
-                        items: (filter, infiniteScrollProps) => storageItems,
+                        items: (filter, infiniteScrollProps) => _storageItems,
                         suffixProps: const DropdownSuffixProps(
                           dropdownButtonProps: DropdownButtonProps(
                             padding: EdgeInsets.zero,
@@ -379,7 +384,9 @@ class _AddFormStoreItemDialogState extends State<AddFormStoreItemDialog>
                                       item.name!,
                                       style: TextStyle(
                                         fontSize: 12,
-                                        color: isDisabled ? AppColors.disableText : AppColors.text,
+                                        color: isDisabled
+                                            ? AppColors.disableText
+                                            : AppColors.text,
                                       ),
                                     ),
                                   );
@@ -577,8 +584,8 @@ class _AddFormStoreItemDialogState extends State<AddFormStoreItemDialog>
                         decoration: BoxDecoration(
                           image: DecorationImage(
                             image: imageProvider,
-                            fit: BoxFit.cover,
                           ),
+                          color: AppColors.main,
                           borderRadius: BorderRadius.circular(15),
                         ),
                       ),
@@ -595,7 +602,12 @@ class _AddFormStoreItemDialogState extends State<AddFormStoreItemDialog>
               Text(name ?? ""),
               Row(
                 children: [
-                  Text("${quantity?.toInt()}"),
+                  Text(
+                    formatNumber(
+                      quantity ?? 0,
+                      locale: getCurrrentLocale(context),
+                    ),
+                  ),
                   const SizedBox(width: 5),
                   Text(unit ?? ""),
                 ],
@@ -657,6 +669,15 @@ class _AddFormStoreItemDialogState extends State<AddFormStoreItemDialog>
                   description: descriptionController.text,
                 );
                 await _storeItemService.createStoreItem(newItem);
+
+                Activity activity = Activity(
+                  status: "Add",
+                  details: {
+                    "name": nameController.text,
+                    "desc": "Added Store Item",
+                  },
+                );
+                await _activitiesService.createActivities(activity);
 
                 setState(() => _isLoadingSaveIntoFirebase = false);
                 navigator.pop();

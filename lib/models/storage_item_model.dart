@@ -24,7 +24,7 @@ class StorageItem {
     double? percentage,
     DateTime? timestamp,
   })  : timestamp = timestamp ?? DateTime.now(),
-        percentage = currentWeight! / maxWeight!;
+        percentage = (currentWeight! <= 0 ? 0.000001 : currentWeight) / maxWeight!;
 
   factory StorageItem.fromFirestore(
       QueryDocumentSnapshot<Map<String, dynamic>> snapshot) {

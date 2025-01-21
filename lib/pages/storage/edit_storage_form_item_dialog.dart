@@ -5,6 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:koda/helpers/format_number.dart';
+import 'package:koda/helpers/get_current_locale.dart';
+import 'package:koda/models/activity_model.dart';
+import 'package:koda/services/activities_service.dart';
 import 'package:koda/utils/app_colors.dart';
 import 'package:koda/models/storage_item_model.dart';
 import 'package:koda/services/image_service.dart';
@@ -42,6 +46,7 @@ class _EditStorageFormItemDialogState extends State<EditStorageFormItemDialog>
   bool _isLoadingLoadImage = false;
   bool _isLoadingSaveIntoFirebase = false;
   final StorageItemService _storageItemService = StorageItemService();
+  final ActivitiesService _activitiesService = ActivitiesService();
 
   @override
   void initState() {
@@ -53,7 +58,10 @@ class _EditStorageFormItemDialogState extends State<EditStorageFormItemDialog>
 
   void _initiliazeForm() async {
     nameController.text = widget.item.name ?? "";
-    weightController.text = widget.item.maxWeight.toString();
+    weightController.text = formatNumber(
+      widget.item.maxWeight ?? 0,
+      locale: getCurrrentLocale(context),
+    );
     descriptionController.text = widget.item.description ?? "";
     selectedUnit = widget.item.unit ?? "kg";
     setState(() => _isLoadingLoadImage = true);
@@ -247,6 +255,7 @@ class _EditStorageFormItemDialogState extends State<EditStorageFormItemDialog>
                     image: DecorationImage(
                       image: MemoryImage(_image!),
                     ),
+                    color: AppColors.main,
                     borderRadius: BorderRadius.circular(5),
                   ),
                 ),
@@ -463,8 +472,6 @@ class _EditStorageFormItemDialogState extends State<EditStorageFormItemDialog>
                 if (_isLoadingSaveIntoFirebase) return;
                 setState(() => _isLoadingSaveIntoFirebase = true);
 
-                final navigator = Navigator.of(context);
-
                 StorageItem newItem = widget.item.copyWith(
                   image: _image != null
                       ? await ImageService.uploadImage(_image!)
@@ -478,8 +485,19 @@ class _EditStorageFormItemDialogState extends State<EditStorageFormItemDialog>
                 await _storageItemService.updateStorageItem(newItem);
                 await _storageItemService.updateToStoreItem(newItem);
 
+                Activity activity = Activity(
+                  status: "Edit",
+                  details: {
+                    "name": nameController.text,
+                    "desc": "Edited Storage Item",
+                  },
+                );
+                await _activitiesService.createActivities(activity);
+
                 setState(() => _isLoadingSaveIntoFirebase = false);
-                navigator.pop();
+
+                if (!context.mounted) return;
+                Navigator.of(context).pop();
               },
               style: ElevatedButton.styleFrom(
                 foregroundColor: AppColors.main,

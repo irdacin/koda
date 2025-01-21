@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +7,12 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:koda/components/filter_chip_section.dart';
 import 'package:koda/components/search_bar_field.dart';
+import 'package:koda/helpers/format_number.dart';
+import 'package:koda/helpers/get_current_locale.dart';
+import 'package:koda/models/activity_model.dart';
+import 'package:koda/models/storage_item_model.dart';
+import 'package:koda/services/activities_service.dart';
+import 'package:koda/services/storage_item_service.dart';
 import 'package:koda/utils/app_colors.dart';
 import 'package:koda/helpers/localization_mapper.dart';
 import 'package:koda/models/store_item_model.dart';
@@ -27,24 +34,31 @@ class _StorePageState extends State<StorePage> with WidgetsBindingObserver {
   bool _openDialog = false;
   int _indexDelete = -1;
   bool _isKeyboardOpen = false;
+  bool _isLoadingSaveIntoFirebase = false;
   int _indexShowDescription = -1;
   String _selectedChipLabel = "all";
 
   final StoreItemService _storeItemService = StoreItemService();
+  final StorageItemService _storageItemService = StorageItemService();
+  final ActivitiesService _activitiesService = ActivitiesService();
+  final Map<String, Map<String, dynamic>> _storeActivities = {};
+
+  late Map<String, dynamic> _usedStorageItemsTotal;
   late Stream<List<StoreItem>> _storeItemStream;
-  List<String> _dropdownItem = [];
+  late List<String> _dropdownItem = [];
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _checkKeyboardState();
     _initializeStore();
+    _checkKeyboardState();
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _storeActivities.clear();
     super.dispose();
   }
 
@@ -83,11 +97,12 @@ class _StorePageState extends State<StorePage> with WidgetsBindingObserver {
         body: RefreshIndicator(
           color: Colors.blue,
           onRefresh: () async {
-            _storeItemStream = _storeItemService.getStoreItems(
-              searchField: _searchText,
-              label: _selectedChipLabel,
-            );
-            setState(() {});
+            setState(() {
+              _storeItemStream = _storeItemService.getStoreItems(
+                searchField: _searchText,
+                label: _selectedChipLabel,
+              );
+            });
             ScaffoldMessenger.of(context).removeCurrentSnackBar();
           },
           child: Stack(
@@ -172,7 +187,7 @@ class _StorePageState extends State<StorePage> with WidgetsBindingObserver {
         border: const OutlineInputBorder(
           borderSide: BorderSide.none,
         ),
-        hintText: AppLocalizations.of(context)!.categories,
+        hintText: AppLocalizations.of(context)!.category,
         hintStyle: TextStyle(
           fontSize: 12,
           overflow: TextOverflow.ellipsis,
@@ -181,7 +196,7 @@ class _StorePageState extends State<StorePage> with WidgetsBindingObserver {
         contentPadding: const EdgeInsets.symmetric(horizontal: 10),
       ),
       onSelected: (value) {
-        value = getMappedValue(context, value);
+        value = getLabelValue(context, value);
         setState(() => _selectedChipLabel = value);
         _storeItemStream = _storeItemService.getStoreItems(
           searchField: _searchText,
@@ -226,6 +241,7 @@ class _StorePageState extends State<StorePage> with WidgetsBindingObserver {
               crossAxisSpacing: 30,
               itemBuilder: (context, index) {
                 StoreItem item = snapshot.data![index];
+
                 return _buildStoreItem(index: index, item: item);
               },
             );
@@ -239,12 +255,12 @@ class _StorePageState extends State<StorePage> with WidgetsBindingObserver {
       children: [
         FloatingActionButton(
           backgroundColor: _isEdit ? AppColors.selected : AppColors.secondary,
-          onPressed: () {
-            setState(() => _isEdit ^= true);
-          },
+          onPressed:
+              _isEdit ? _showConfirmChoseActivitiesDialog : _openEditItem,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
+          elevation: _openDialog ? 0 : null,
           heroTag: null,
           child: Icon(
             _isEdit ? FontAwesomeIcons.check : FontAwesomeIcons.penToSquare,
@@ -275,6 +291,7 @@ class _StorePageState extends State<StorePage> with WidgetsBindingObserver {
   }
 
   void _showFormItemDialog({StoreItem? item}) async {
+    if (_isEdit) _closeEditItem();
     setState(() => _openDialog = true);
     await showDialog(
       context: context,
@@ -286,7 +303,12 @@ class _StorePageState extends State<StorePage> with WidgetsBindingObserver {
     setState(() => _openDialog = false);
   }
 
+  void _openEditItem() {
+    setState(() => _isEdit = true);
+  }
+
   void _closeEditItem() {
+    _storeActivities.clear();
     setState(() => _isEdit = false);
   }
 
@@ -399,18 +421,50 @@ class _StorePageState extends State<StorePage> with WidgetsBindingObserver {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       IconButton(
-                        onPressed: () {},
+                        onPressed: (_storeActivities[item.id]?["qty"] ?? 0) <= 0
+                            ? null
+                            : () {
+                                setState(() {
+                                  _storeActivities.update(
+                                    item.id!,
+                                    (value) {
+                                      value["qty"]--;
+                                      return value;
+                                    },
+                                    ifAbsent: () => {
+                                      "name": item.name,
+                                      "qty": -1,
+                                      "usedStorageItem": item.usedStorageItems,
+                                    },
+                                  );
+                                });
+                              },
                         icon: const Icon(Icons.remove),
                       ),
                       Text(
-                        "0",
+                        _storeActivities[item.id]?["qty"].toString() ?? "0",
                         style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       IconButton(
-                        onPressed: () {},
+                        onPressed: () {
+                                setState(() {
+                                  _storeActivities.update(
+                                    item.id!,
+                                    (value) {
+                                      value["qty"]++;
+                                      return value;
+                                    },
+                                    ifAbsent: () => {
+                                      "name": item.name,
+                                      "qty": 1,
+                                      "usedStorageItem": item.usedStorageItems,
+                                    },
+                                  );
+                                });
+                              },
                         icon: const Icon(Icons.add),
                       ),
                     ],
@@ -446,16 +500,9 @@ class _StorePageState extends State<StorePage> with WidgetsBindingObserver {
                   style: TextStyle(
                     color: AppColors.secondaryText,
                     overflow: TextOverflow.ellipsis,
-                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
                   ),
-                ),
-              ),
-              Text(
-                AppLocalizations.of(context)!.description,
-                style: TextStyle(
-                  color: AppColors.secondaryText,
-                  overflow: TextOverflow.ellipsis,
-                  fontSize: 12,
                 ),
               ),
               const SizedBox(height: 5),
@@ -511,12 +558,317 @@ class _StorePageState extends State<StorePage> with WidgetsBindingObserver {
     );
   }
 
+  void _showConfirmChoseActivitiesDialog() async {
+    setState(() => _openDialog = true);
+    bool isConfirmed = await showDialog(
+      context: context,
+      builder: (context) {
+        return BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Dialog(
+            insetPadding: const EdgeInsets.only(
+              left: 15,
+              right: 15,
+              top: 60,
+              bottom: 169,
+            ),
+            elevation: 10,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            backgroundColor: AppColors.selected,
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
+              child: Stack(
+                children: [
+                  _buildChoseOrderLists(context),
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: _buildButtomDialogButton(context),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+
+    if (isConfirmed) {
+      _closeEditItem();
+    }
+    setState(() => _openDialog = true);
+  }
+
+  Widget _buildChoseOrderLists(BuildContext context) {
+    final List<Map<String, dynamic>> orderLists =
+        _storeActivities.values.where((entry) => entry["qty"] != 0).toList();
+
+    _usedStorageItemsTotal = {};
+    for (final entry in orderLists) {
+      final usedStorageItems =
+          entry["usedStorageItem"] as List<Map<String, dynamic>>?;
+      if (usedStorageItems != null) {
+        for (final item in usedStorageItems) {
+          final String id = item["id"];
+          final String name = item["name"];
+          final double qty = item["quantity"] ?? 0;
+          final String unit = item["unit"];
+
+          if (_usedStorageItemsTotal.containsKey(id)) {
+            _usedStorageItemsTotal[id]!["total"] += qty * entry["qty"];
+          } else {
+            _usedStorageItemsTotal[id] = {
+              "name": name,
+              "total": qty * entry["qty"],
+              "unit": unit
+            };
+          }
+        }
+      }
+    }
+
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(40, 40, 40, 65),
+        child: Column(
+          children: [
+            Text(
+              AppLocalizations.of(context)!.orderLists,
+              style: TextStyle(
+                color: AppColors.secondaryText,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 18),
+            Container(
+              width: MediaQuery.of(context).size.width,
+              height: 2,
+              color: AppColors.secondaryText,
+            ),
+            SizedBox(height: 12),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 5),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    AppLocalizations.of(context)!.itemName,
+                    style: TextStyle(
+                      color: AppColors.secondaryText,
+                      fontSize: 18,
+                    ),
+                  ),
+                  Text(
+                    AppLocalizations.of(context)!.qty,
+                    style: TextStyle(
+                      color: AppColors.secondaryText,
+                      fontSize: 18,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 12),
+            Container(
+              width: MediaQuery.of(context).size.width,
+              height: 2,
+              color: AppColors.secondaryText,
+            ),
+            SizedBox(height: 8),
+            ...orderLists.map(
+              (item) => Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      item['name'],
+                      style: TextStyle(
+                        color: AppColors.secondaryText,
+                        fontSize: 18,
+                      ),
+                    ),
+                    Text(
+                      item['qty'].toString(),
+                      style: TextStyle(
+                        color: AppColors.secondaryText,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(height: 24),
+            Container(
+              width: MediaQuery.of(context).size.width,
+              height: 2,
+              color: AppColors.secondaryText,
+            ),
+            SizedBox(height: 12),
+            Text(
+              AppLocalizations.of(context)!.itemUsed,
+              style: TextStyle(
+                color: AppColors.secondaryText,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 12),
+            Container(
+              width: MediaQuery.of(context).size.width,
+              height: 2,
+              color: AppColors.secondaryText,
+            ),
+            SizedBox(height: 8),
+            ..._usedStorageItemsTotal.values.map(
+              (item) {
+                return Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        item['name'],
+                        style: TextStyle(
+                          color: AppColors.secondaryText,
+                          fontSize: 18,
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            formatNumber(
+                              item['total'],
+                              locale: getCurrrentLocale(context),
+                            ),
+                            style: TextStyle(
+                              color: AppColors.secondaryText,
+                              fontSize: 18,
+                            ),
+                          ),
+                          SizedBox(width: 3),
+                          Text(
+                            item['unit'],
+                            style: TextStyle(
+                              color: AppColors.secondaryText,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildButtomDialogButton(BuildContext context) {
+    return Container(
+      height: 60,
+      padding: const EdgeInsets.only(left: 20, right: 4),
+      decoration: BoxDecoration(
+        color: AppColors.selected,
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(10),
+          bottomRight: Radius.circular(10),
+        ),
+      ),
+      alignment: Alignment.center,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          InkWell(
+            onTap: () {
+              if (_isLoadingSaveIntoFirebase) return;
+              Navigator.pop(context, false);
+            },
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.arrow_back_ios,
+                  color: AppColors.secondaryText,
+                  size: 25,
+                ),
+                Text(
+                  AppLocalizations.of(context)!.back,
+                  style: TextStyle(
+                    color: AppColors.secondaryText,
+                    fontSize: 16,
+                  ),
+                )
+              ],
+            ),
+          ),
+          IconButton(
+            onPressed: () async {
+              if (_isLoadingSaveIntoFirebase) return;
+              setState(() => _isLoadingSaveIntoFirebase = true);
+              Activity activity = Activity(
+                status: "Sold",
+                details: _storeActivities.values
+                    .where((entry) => entry["qty"] != 0)
+                    .toList(),
+              );
+              _activitiesService.createActivities(activity);
+
+              for (var entry in _usedStorageItemsTotal.entries) {
+                StorageItem? item =
+                    await _storageItemService.getStorageItem(entry.key);
+                await _storageItemService.updateStorageItem(item!.copyWith(
+                  currentWeight: item.currentWeight! - entry.value["total"],
+                ));
+              }
+
+              setState(() => _isLoadingSaveIntoFirebase = false);
+
+              if (!context.mounted) return;
+              Navigator.pop(context, true);
+            },
+            constraints: const BoxConstraints(),
+            icon: const Icon(FontAwesomeIcons.check),
+            iconSize: 25,
+            style: IconButton.styleFrom(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+            color: AppColors.secondaryText,
+          ),
+        ],
+      ),
+    );
+  }
+
   void _deleteItem(StoreItem item) async {
+    if (_isEdit) _closeEditItem();
     setState(() => _indexDelete = -1);
     final snackbar = ScaffoldMessenger.of(context);
     snackbar.removeCurrentSnackBar();
 
+    final Activity activity = Activity(
+      status: "Delete",
+      details: {
+        "name": item.name,
+        "desc": "Deleted Store Item",
+      },
+    );
+
     await _storeItemService.deleteStoreItem(item);
+    await _activitiesService.createActivities(activity);
 
     if (!mounted) return;
 
@@ -534,7 +886,10 @@ class _StorePageState extends State<StorePage> with WidgetsBindingObserver {
       action: SnackBarAction(
         label: AppLocalizations.of(context)!.undo,
         textColor: AppColors.selected,
-        onPressed: () => _storeItemService.undoDeleteItem(item),
+        onPressed: () {
+          _storeItemService.undoDeleteItem(item);
+          _activitiesService.deleteActivity(activity);
+        },
       ),
     ));
   }

@@ -1,11 +1,17 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:http/http.dart' as http;
 import 'package:koda/helpers/url_helper.dart';
 
 class ImageService {
   static Future<String?> uploadImage(Uint8List imageBytes) async {
-    final base64Image = base64Encode(imageBytes);
+    Uint8List compressed = await FlutterImageCompress.compressWithList(
+      imageBytes,
+      quality: 5,
+    );
+    
+    final base64Image = base64Encode(compressed);
 
     final response = await http.post(
       Uri.parse(UrlHelper.urlUploadImage),
