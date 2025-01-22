@@ -55,15 +55,16 @@ class _FilterChipSectionState extends State<FilterChipSection> {
             styledLabel = Icon(
               labelWidget.icon,
               color: isSelected ? widget.selectedIconColor : widget.iconColor,
-              size: labelWidget.size,
+              size: isSelected ? 15 : labelWidget.size,
             );
           } else if (labelWidget is Text) {
             styledLabel = Text(
               labelWidget.data ?? "",
               style: TextStyle(
-                fontSize: 12,
+                fontSize: isSelected ? 15 : 12,
                 color:
                     isSelected ? widget.selectedLabelColor : widget.labelColor,
+                fontWeight: isSelected ? FontWeight.w900 : null
               ),
             );
           } else if (labelWidget is DropdownSearch<String>) {
@@ -81,7 +82,7 @@ class _FilterChipSectionState extends State<FilterChipSection> {
                         border: OutlineInputBorder(),
                       ),
                   baseStyle: TextStyle(
-                    fontSize: 12,
+                    fontSize: isSelected ? 15 : 12,
                     overflow: TextOverflow.ellipsis,
                     color: isSelected
                         ? widget.selectedLabelColor

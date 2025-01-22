@@ -13,7 +13,7 @@ import 'package:koda/services/activities_service.dart';
 import 'package:koda/utils/app_colors.dart';
 import 'package:koda/helpers/localization_mapper.dart';
 import 'package:koda/models/storage_item_model.dart';
-import 'package:koda/pages/settings/settings_page.dart';
+import 'package:koda/pages/settings/profile_page.dart';
 import 'package:koda/pages/storage/add_storage_form_item_dialog.dart';
 import 'package:koda/pages/storage/edit_storage_form_item_dialog.dart';
 import 'package:koda/services/storage_item_service.dart';
@@ -132,7 +132,7 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
       actions: [
         IconButton(
           onPressed: () => Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => const SettingsPage()),
+            MaterialPageRoute(builder: (context) => const ProfilePage()),
           ),
           icon: Icon(
             Icons.menu,
@@ -312,7 +312,9 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
                     width: 100,
                     height: 100,
                     decoration: BoxDecoration(
-                      color: const Color(0xffc3c3c3),
+                      color: Theme.of(context).brightness == Brightness.light
+                                  ? const Color(0xffc3c3c3)
+                                  : AppColors.darkMain,
                       borderRadius: BorderRadius.circular(15),
                     ),
                   )
@@ -388,12 +390,16 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
                   Row(
                     children: [
                       Expanded(
-                        child: Text(
-                          name,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            overflow: TextOverflow.ellipsis,
+                        child: Container(
+                          height: 30,
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            name,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         ),
                       ),
@@ -478,7 +484,7 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
                         )
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 10),
                   if (!isShowTheStoreUsed) ...[
                     Stack(
                       children: [

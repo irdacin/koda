@@ -645,19 +645,12 @@ class _AddFormStoreItemDialogState extends State<AddFormStoreItemDialog>
       alignment: Alignment.center,
       child: Row(
         children: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(FontAwesomeIcons.paste),
-            iconSize: 30,
-          ),
           const SizedBox(width: 10),
           Expanded(
             child: ElevatedButton(
               onPressed: () async {
                 if (_isLoadingSaveIntoFirebase) return;
                 setState(() => _isLoadingSaveIntoFirebase = true);
-
-                final navigator = Navigator.of(context);
 
                 StoreItem newItem = StoreItem(
                   image: image != null
@@ -680,7 +673,8 @@ class _AddFormStoreItemDialogState extends State<AddFormStoreItemDialog>
                 await _activitiesService.createActivities(activity);
 
                 setState(() => _isLoadingSaveIntoFirebase = false);
-                navigator.pop();
+                if (!context.mounted) return;
+                Navigator.of(context).pop();
               },
               style: ElevatedButton.styleFrom(
                 foregroundColor: Colors.white,
@@ -695,8 +689,8 @@ class _AddFormStoreItemDialogState extends State<AddFormStoreItemDialog>
                       width: 22.5,
                       height: 22.5,
                       padding: const EdgeInsets.all(2),
-                      child: CircularProgressIndicator(
-                        color: AppColors.main,
+                      child: const CircularProgressIndicator(
+                        color: Colors.white,
                         strokeWidth: 3,
                       ),
                     )

@@ -22,7 +22,9 @@ class _NavigationBarPageState extends State<NavigationBarPage> {
     _initiliazeNavigationBar();
   }
 
-  void _initiliazeNavigationBar() {}
+  void _initiliazeNavigationBar() async {
+    
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,41 +49,33 @@ class _NavigationBarPageState extends State<NavigationBarPage> {
               child: Container(
                 alignment: Alignment.topCenter,
                 child: Text(
-                  "Hold and Drag to arrange navigation",
-                  style: TextStyle(fontSize: 14),
+                  AppLocalizations.of(context)!.holdAndDragToArrangeNavigation,
+                  style: TextStyle(fontSize: 16),
+                  textAlign: TextAlign.center,
                 ),
               ),
             ),
             Flexible(
-              flex: 3,
+              flex: 4,
               child: Container(
                 width: 200,
+                height: 320,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(color: AppColors.secondary),
                 ),
                 padding: EdgeInsets.all(10),
-                child: ReorderableListView(
-                    clipBehavior: Clip.hardEdge,
-                    onReorder: (oldIndex, newIndex) {
-                      setState(() {
-                        if (newIndex > oldIndex) {
-                          newIndex -= 1;
-                        }
-
-                        final item = navBarLabel.removeAt(oldIndex);
-                        navBarLabel.insert(newIndex, item);
-                      });
-                    },
-                    children: [
-                      for (int index = 0; index < navBarLabel.length; index++)
-                        Container(
-                          key: ValueKey(navBarLabel[index]),
-                          alignment: Alignment.center,
-                          height: 100,
-                          width: MediaQuery.of(context).size.width,
-                          child: Container(
-
+                child: ReorderableListView.builder(
+                  itemBuilder: (context, index) {
+                    return Container(
+                      key: ValueKey(navBarLabel[index]),
+                      child: Stack(
+                        children: [
+                          Container(
+                            alignment: Alignment.center,
+                            height: 100,
+                            width: double.infinity,
+                            decoration: const BoxDecoration(),
                             child: Text(
                               navBarLabel[index],
                               style: const TextStyle(
@@ -89,8 +83,32 @@ class _NavigationBarPageState extends State<NavigationBarPage> {
                               ),
                             ),
                           ),
-                        ),
-                    ]),
+                          if (index < navBarLabel.length - 1)
+                            Positioned(
+                              bottom: 0,
+                              left: 0,
+                              right: 0,
+                              child: Divider(
+                                color: AppColors.secondary,
+                                height: 1,
+                                thickness: 1,
+                              ),
+                            ),
+                        ],
+                      ),
+                    );
+                  },
+                  onReorder: (oldIndex, newIndex) {
+                    setState(() {
+                      if (newIndex > oldIndex) {
+                        newIndex -= 1;
+                      }
+                      final item = navBarLabel.removeAt(oldIndex);
+                      navBarLabel.insert(newIndex, item);
+                    });
+                  },
+                  itemCount: navBarLabel.length,
+                ),
               ),
             )
           ],

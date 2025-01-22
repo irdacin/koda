@@ -9,11 +9,11 @@ class StoreItemService {
 
   Future<void> createStoreItem(StoreItem storeItem) async {
     try {
-      await updateToStorageItem(storeItem);
       await _firestore
           .collection(_tableName)
           .doc(storeItem.id)
           .set(storeItem.toFirestore());
+      await updateToStorageItem(storeItem);
     } catch (_) {}
   }
 
@@ -103,7 +103,7 @@ class StoreItemService {
       
       int index = currentItems.indexWhere((item) => item['id'] == storeItem.id);
       if (index == -1) {
-        currentItems.add({'id': storeItem.id!, 'name': storeItem.name});
+        currentItems.add({'id': storeItem.id, 'name': storeItem.name});
       } else {
         currentItems[index]['name'] = storeItem.name;
       }

@@ -10,7 +10,7 @@ import 'package:koda/helpers/localization_mapper.dart';
 import 'package:koda/models/activity_model.dart';
 import 'package:koda/services/activities_service.dart';
 import 'package:koda/utils/app_colors.dart';
-import 'package:koda/pages/settings/settings_page.dart';
+import 'package:koda/pages/settings/profile_page.dart';
 
 class ActivitiesPage extends StatefulWidget {
   const ActivitiesPage({super.key});
@@ -87,7 +87,7 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
         IconButton(
           onPressed: () => Navigator.of(context)
               .push(
-                MaterialPageRoute(builder: (context) => const SettingsPage()),
+                MaterialPageRoute(builder: (context) => const ProfilePage()),
               )
               .then(
                 (value) => setState(() {}),
@@ -271,6 +271,7 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                                       child: Text(
                                         detail["name"]!,
                                         style: const TextStyle(fontSize: 12),
+                                        overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
                                     Text(
@@ -286,6 +287,7 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                                         detail['unit'],
                                         style: const TextStyle(
                                           fontSize: 12,
+                                          overflow: TextOverflow.ellipsis,
                                         ),
                                       )
                                     ]
@@ -298,19 +300,18 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                           padding: const EdgeInsets.only(top: 5.0),
                           child: Text(
                             details,
-                            style: const TextStyle(
-                              fontSize: 12,
-                            ),
+                            style: const TextStyle(fontSize: 12),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         )
                       else
-                        Padding(
+                        Container(
+                          width: MediaQuery.of(context).size.width - 180,
                           padding: const EdgeInsets.only(top: 5),
                           child: Text(
                             "${getActivityValue(context, details["desc"])} : ${details["name"]}",
-                            style: const TextStyle(
-                              fontSize: 12,
-                            ),
+                            style: const TextStyle(fontSize: 12),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                     ],

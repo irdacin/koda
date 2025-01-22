@@ -5,11 +5,12 @@ import 'package:koda/utils/app_colors.dart';
 class DarkTheme {
   static ThemeData theme = ThemeData.dark().copyWith(
     scaffoldBackgroundColor: AppColors.darkBackground,
+    colorScheme: const ColorScheme.dark(primary: Colors.white),
     appBarTheme: AppBarTheme(
       foregroundColor: AppColors.darkText,
       color: AppColors.darkBackground,
-      titleTextStyle: TextStyle(
-        fontWeight: FontWeight.bold,
+      titleTextStyle: GoogleFonts.poppins(
+        fontWeight: FontWeight.w500,
         fontSize: 30,
         color: AppColors.darkText,
       ),

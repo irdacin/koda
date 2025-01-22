@@ -1,11 +1,10 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:koda/helpers/constant.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:koda/pages/auth/login_page.dart';
 import 'package:koda/components/input_field.dart';
 import 'package:koda/pages/home/main_page.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:koda/services/auth_service.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -15,72 +14,31 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  TextEditingController emailController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
-  TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
+  final FocusNode emailFocusNode = FocusNode();
+  final FocusNode passwordFocusNode = FocusNode();
+  final FocusNode confirmPasswordFocusNode = FocusNode();
+  final _authService = AuthService();
 
-  FocusNode emailFocusNode = FocusNode();
-  FocusNode passwordFocusNode = FocusNode();
-  FocusNode confirmPasswordFocusNode = FocusNode();
-  bool emailFocus = false;
-  bool passwordFocus = false;
-  bool confirmPasswordFocus = false;
-  bool showPasswordText = false;
-  bool showConfirmPasswordText = false;
-  String? errorEmailText;
-  String? errorPasswordText;
-  String? errorConfirmPasswordText;
+  bool _showPasswordText = false;
+  bool _showConfirmPasswordText = false;
+  bool _isLoading = false;
+  String? _errorEmailText;
+  String? _errorPasswordText;
+  String? _errorConfirmPasswordText;
 
-  Future<void> registerUser() async {
-    setState(() {
-      if (emailController.text.isEmpty) {
-        errorEmailText = "Email is required";
-      }
-
-      if (passwordController.text.isEmpty) {
-        errorPasswordText = "Password is required";
-      }
-
-      if (confirmPasswordController.text.isEmpty) {
-        errorConfirmPasswordText = "Confirm Password is required";
-      }
-
-      if (passwordController.text != confirmPasswordController.text) {
-        errorConfirmPasswordText = "Password does not match";
-      }
-    });
-
-    if (errorEmailText != null ||
-        errorPasswordText != null ||
-        errorConfirmPasswordText != null) {
-      return;
-    }
-
-    try {
-      final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
-      await firebaseAuth.createUserWithEmailAndPassword(
-        email: emailController.text,
-        password: passwordController.text,
-      );
-
-      final prefs = await SharedPreferences.getInstance();
-      prefs.setBool(KEY_LOGGED_IN, true);
-
-      if (!mounted) return;
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const MainPage()),
-      );
-    } on FirebaseAuthException catch (e) {
-      setState(() {
-        if (e.code == "weak-password") {
-          errorPasswordText = "Password is too weak";
-        } else if (e.code == "email-already-in-use") {
-          errorEmailText = "Email already in use";
-        } else if (e.code == "invalid-email") {
-          errorEmailText = "Email is not valid";
-        }
-      });
-    }
+  @override
+  void dispose() {
+    emailFocusNode.dispose();
+    passwordFocusNode.dispose();
+    confirmPasswordFocusNode.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
+    super.dispose();
   }
 
   @override
@@ -96,25 +54,30 @@ class _RegisterPageState extends State<RegisterPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Center(
-                  child: Text(
-                    AppLocalizations.of(context)!.register.toUpperCase(),
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 30,
-                    ),
+                Text(
+                  AppLocalizations.of(context)!.createAnAccount,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 30,
                   ),
                 ),
-                const SizedBox(height: 30),
+                const SizedBox(height: 10),
+                Text(
+                  AppLocalizations.of(context)!.detailRegister,
+                  style: const TextStyle(
+                    fontSize: 18,
+                  ),
+                ),
+                const SizedBox(height: 40),
                 InputField(
                   controller: emailController,
                   focusNode: emailFocusNode,
                   labelText: AppLocalizations.of(context)!.email,
                   icon: Icons.email,
-                  errorText: errorEmailText,
+                  errorText: _errorEmailText,
                   onChanged: (value) {
                     setState(() {
-                      errorEmailText = null;
+                      _errorEmailText = null;
                     });
                   },
                 ),
@@ -124,25 +87,25 @@ class _RegisterPageState extends State<RegisterPage> {
                   focusNode: passwordFocusNode,
                   onChanged: (value) {
                     setState(() {
-                      errorPasswordText = null;
+                      _errorPasswordText = null;
                     });
                   },
                   labelText: AppLocalizations.of(context)!.password,
-                  errorText: errorPasswordText,
+                  errorText: _errorPasswordText,
                   icon: Icons.lock,
                   trailing: IconButton(
                     onPressed: () {
                       setState(() {
-                        showPasswordText ^= true;
+                        _showPasswordText ^= true;
                       });
                     },
                     icon: Icon(
-                      showPasswordText
+                      _showPasswordText
                           ? Icons.visibility
                           : Icons.visibility_off,
                     ),
                   ),
-                  isVisible: showPasswordText,
+                  isVisible: _showPasswordText,
                 ),
                 const SizedBox(height: 20),
                 InputField(
@@ -150,27 +113,27 @@ class _RegisterPageState extends State<RegisterPage> {
                   focusNode: confirmPasswordFocusNode,
                   onChanged: (value) {
                     setState(() {
-                      errorConfirmPasswordText = null;
+                      _errorConfirmPasswordText = null;
                     });
                   },
-                  labelText: "Confirm Passsword",
-                  errorText: errorConfirmPasswordText,
+                  labelText: AppLocalizations.of(context)!.confirmPassword,
+                  errorText: _errorConfirmPasswordText,
                   icon: Icons.lock,
                   trailing: IconButton(
                     onPressed: () {
                       setState(() {
-                        showConfirmPasswordText ^= true;
+                        _showConfirmPasswordText ^= true;
                       });
                     },
                     icon: Icon(
-                      showConfirmPasswordText
+                      _showConfirmPasswordText
                           ? Icons.visibility
                           : Icons.visibility_off,
                     ),
                   ),
-                  isVisible: showConfirmPasswordText,
+                  isVisible: _showConfirmPasswordText,
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 40),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -182,13 +145,26 @@ class _RegisterPageState extends State<RegisterPage> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    child: Text(AppLocalizations.of(context)!.register.toUpperCase()),
+                    child: _isLoading
+                        ? Container(
+                            width: 22.5,
+                            height: 22.5,
+                            padding: const EdgeInsets.all(2),
+                            child: const CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 3,
+                            ),
+                          )
+                        : Text(AppLocalizations.of(context)!
+                            .register
+                            .toUpperCase()),
                   ),
                 ),
                 Row(
                   children: [
                     Text(
                       AppLocalizations.of(context)!.alreadyHaveAnAccount,
+                      style: GoogleFonts.poppins(fontSize: 14),
                     ),
                     TextButton(
                       onPressed: () {
@@ -198,7 +174,10 @@ class _RegisterPageState extends State<RegisterPage> {
                           ),
                         );
                       },
-                      child: Text(AppLocalizations.of(context)!.login.toUpperCase()),
+                      child: Text(
+                        AppLocalizations.of(context)!.login.toUpperCase(),
+                        style: GoogleFonts.poppins(fontSize: 14),
+                      ),
                     )
                   ],
                 )
@@ -208,5 +187,59 @@ class _RegisterPageState extends State<RegisterPage> {
         ),
       ),
     );
+  }
+
+  Future<void> registerUser() async {
+    setState(() {
+      _isLoading = true;
+      if (emailController.text.isEmpty) {
+        _errorEmailText = AppLocalizations.of(context)!.emailIsRequired;
+      }
+
+      if (passwordController.text.isEmpty) {
+        _errorPasswordText = AppLocalizations.of(context)!.passwordIsRequired;
+      }
+
+      if (confirmPasswordController.text.isEmpty) {
+        _errorConfirmPasswordText =
+            AppLocalizations.of(context)!.confirmPasswordIsRequired;
+      }
+
+      if (passwordController.text != confirmPasswordController.text) {
+        _errorConfirmPasswordText =
+            AppLocalizations.of(context)!.passwordDoesNotMatch;
+      }
+    });
+
+    if (_errorEmailText != null ||
+        _errorPasswordText != null ||
+        _errorConfirmPasswordText != null) {
+      setState(() => _isLoading = false);
+
+      return;
+    }
+
+    String? error = await _authService.register(
+      emailController.text,
+      passwordController.text,
+    );
+    setState(() => _isLoading = false);
+
+    if (error == null && mounted) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const MainPage()),
+      );
+      return;
+    }
+
+    setState(() {
+      if (error == "weak-password") {
+        _errorPasswordText = AppLocalizations.of(context)!.passwordIsTooWeak;
+      } else if (error == "email-already-in-use") {
+        _errorEmailText = AppLocalizations.of(context)!.emailAlreadyInUse;
+      } else if (error == "invalid-email") {
+        _errorEmailText = AppLocalizations.of(context)!.emailIsNotValid;
+      }
+    });
   }
 }

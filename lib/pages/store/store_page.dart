@@ -16,7 +16,7 @@ import 'package:koda/services/storage_item_service.dart';
 import 'package:koda/utils/app_colors.dart';
 import 'package:koda/helpers/localization_mapper.dart';
 import 'package:koda/models/store_item_model.dart';
-import 'package:koda/pages/settings/settings_page.dart';
+import 'package:koda/pages/settings/profile_page.dart';
 import 'package:koda/pages/store/add_store_item_form_dialog.dart';
 import 'package:koda/pages/store/edit_store_form_item_dialog.dart';
 import 'package:koda/services/store_item_service.dart';
@@ -43,7 +43,7 @@ class _StorePageState extends State<StorePage> with WidgetsBindingObserver {
   final ActivitiesService _activitiesService = ActivitiesService();
   final Map<String, Map<String, dynamic>> _storeActivities = {};
 
-  late Map<String, dynamic> _usedStorageItemsTotal;
+  late Map<String, dynamic> _usedStorageItemsTotal = {};
   late Stream<List<StoreItem>> _storeItemStream;
   late List<String> _dropdownItem = [];
 
@@ -144,7 +144,7 @@ class _StorePageState extends State<StorePage> with WidgetsBindingObserver {
       actions: [
         IconButton(
           onPressed: () => Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => const SettingsPage()),
+            MaterialPageRoute(builder: (context) => const ProfilePage()),
           ),
           icon: Icon(
             Icons.menu,

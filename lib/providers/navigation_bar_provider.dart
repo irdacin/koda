@@ -3,12 +3,12 @@ import 'package:koda/helpers/constant.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class NavigationBarProvider extends ChangeNotifier {
-  late String _store;
-  late String _storage;
-  late String _activities;
-  String get store => _store;
-  String get storage => _storage;
-  String get activities => _activities;
+  late int _store;
+  late int _storage;
+  late int _activities;
+  int get store => _store;
+  int get storage => _storage;
+  int get activities => _activities;
 
   NavigationBarProvider() {
     _initiliazeNavigationBar();
@@ -16,30 +16,12 @@ class NavigationBarProvider extends ChangeNotifier {
 
   Future<void> _initiliazeNavigationBar() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    _store = prefs.getString(KEY_NAVIGATION_BAR_STORE) ?? "STORE";
-    _storage = prefs.getString(KEY_NAVIGATION_BAR_STORAGE) ?? "STORAGE";
-    _activities = prefs.getString(KEY_NAVIGATION_BAR_ACTIVITIES) ?? "ACTIVITIES";
+    _store = prefs.getInt(KEY_NAVIGATION_BAR_STORE) ?? 0;
+    _storage = prefs.getInt(KEY_NAVIGATION_BAR_STORAGE) ?? 1;
+    _activities = prefs.getInt(KEY_NAVIGATION_BAR_ACTIVITIES) ?? 2;
     notifyListeners();
   }
   
-  void changeStoreName(String value) {
-    _store = value;
-    _saveNavigationBarName(KEY_NAVIGATION_BAR_STORE, value);
-    notifyListeners();
-  }
-
-  void changeStorageName(String value) {
-    _storage = value;
-    _saveNavigationBarName(KEY_NAVIGATION_BAR_STORAGE, value);
-    notifyListeners();
-  }
-
-  void changeActivitiesName(String value) {
-    _activities = value;
-    _saveNavigationBarName(KEY_NAVIGATION_BAR_ACTIVITIES, value);
-    notifyListeners();
-  }
-
   Future<void> _saveNavigationBarName(String key, String newValue) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString(key, newValue);

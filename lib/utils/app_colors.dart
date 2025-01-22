@@ -3,14 +3,16 @@ import 'package:flutter/material.dart';
 class AppColors {
   static bool _isDarkMode = false;
 
-  static void updateTheme(bool isDarkMode) {
-    _isDarkMode = isDarkMode;
+  static void updateTheme(bool? isDarkMode) {
+    if (isDarkMode != null) _isDarkMode = isDarkMode;
   }
 
   static Color lightMain = const Color(0xffffffff);
   static Color darkMain = const Color(0xff888888);
   static Color lightSecondary = const Color(0xffd9d9d9);
   static Color darkSecondary = const Color(0xff555555);
+  static Color lightBorder = const Color(0xff000000);
+  static Color darkBorder = const Color(0xffffffff);
   static Color lightText = const Color(0xff000000);
   static Color darkText = const Color(0xffffffff);
   static Color secondaryText = const Color(0xffffffff);
@@ -25,4 +27,5 @@ class AppColors {
   static Color get disableText => _isDarkMode ? darkDisableText : lightDisableText;
   static Color get secondary => _isDarkMode ? darkSecondary : lightSecondary;
   static Color get main => _isDarkMode ? darkMain : lightMain;
+  static Color get border => _isDarkMode ? darkBorder : lightBorder;
 }

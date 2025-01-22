@@ -1,11 +1,10 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:koda/helpers/constant.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:koda/components/input_field.dart';
 import 'package:koda/pages/home/main_page.dart';
 import 'package:koda/pages/auth/register_page.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:koda/services/auth_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -15,36 +14,23 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  TextEditingController emailController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final FocusNode emailFocusNode = FocusNode();
+  final FocusNode passwordFocusNode = FocusNode();
+  final AuthService _authService = AuthService();
 
-  FocusNode emailFocusNode = FocusNode();
-  FocusNode passwordFocusNode = FocusNode();
-  bool emailFocus = false;
-  bool passwordFocus = false;
-  bool showPasswordText = false;
+  bool _isLoading = false;
+  bool _showPasswordText = false;
   String? errorText;
 
-  Future<void> loginUser() async {
-    try {
-      final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
-      await firebaseAuth.signInWithEmailAndPassword(
-        email: emailController.text,
-        password: passwordController.text,
-      );
-
-      final prefs = await SharedPreferences.getInstance();
-      prefs.setBool(KEY_LOGGED_IN, true);
-
-      if (!mounted) return;
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const MainPage()),
-      );
-    } on FirebaseAuthException catch (_) {
-      setState(() {
-        errorText = AppLocalizations.of(context)!.invalidEmailOrPassword;
-      });
-    }
+  @override
+  void dispose() {
+    emailFocusNode.dispose();
+    passwordFocusNode.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
   }
 
   @override
@@ -60,16 +46,21 @@ class _LoginPageState extends State<LoginPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Center(
-                  child: Text(
-                    AppLocalizations.of(context)!.login.toUpperCase(),
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 30,
-                    ),
+                Text(
+                  AppLocalizations.of(context)!.login,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 30,
                   ),
                 ),
-                const SizedBox(height: 30),
+                const SizedBox(height: 10),
+                Text(
+                  AppLocalizations.of(context)!.detailLogin,
+                  style: const TextStyle(
+                    fontSize: 18,
+                  ),
+                ),
+                const SizedBox(height: 40),
                 InputField(
                   controller: emailController,
                   focusNode: emailFocusNode,
@@ -94,21 +85,21 @@ class _LoginPageState extends State<LoginPage> {
                   labelText: AppLocalizations.of(context)!.password,
                   icon: Icons.lock,
                   errorText: errorText,
-                  isVisible: showPasswordText,
+                  isVisible: _showPasswordText,
                   trailing: IconButton(
                     onPressed: () {
                       setState(() {
-                        showPasswordText ^= true;
+                        _showPasswordText ^= true;
                       });
                     },
                     icon: Icon(
-                      showPasswordText
+                      _showPasswordText
                           ? Icons.visibility
                           : Icons.visibility_off,
                     ),
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 40),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -120,13 +111,26 @@ class _LoginPageState extends State<LoginPage> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    child: Text(AppLocalizations.of(context)!.login.toUpperCase()),
+                    child: _isLoading
+                        ? Container(
+                            width: 22.5,
+                            height: 22.5,
+                            padding: const EdgeInsets.all(2),
+                            child: const CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 3,
+                            ),
+                          )
+                        : Text(
+                            AppLocalizations.of(context)!.login.toUpperCase(),
+                          ),
                   ),
                 ),
                 Row(
                   children: [
                     Text(
                       AppLocalizations.of(context)!.dontHaveAnAccount,
+                      style: GoogleFonts.poppins(fontSize: 14),
                     ),
                     TextButton(
                       onPressed: () {
@@ -136,7 +140,10 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         );
                       },
-                      child: Text(AppLocalizations.of(context)!.register.toUpperCase()),
+                      child: Text(
+                        AppLocalizations.of(context)!.register.toUpperCase(),
+                        style: GoogleFonts.poppins(fontSize: 14),
+                      ),
                     )
                   ],
                 )
@@ -146,5 +153,26 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     );
+  }
+
+  Future<void> loginUser() async {
+    setState(() => _isLoading = true);
+    String? error = await _authService.login(
+      emailController.text,
+      passwordController.text,
+    );
+    setState(() => _isLoading = false);
+
+    if (error == null && mounted) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const MainPage()),
+      );
+
+      return;
+    }
+
+    setState(() {
+      errorText = AppLocalizations.of(context)!.invalidEmailOrPassword;
+    });
   }
 }

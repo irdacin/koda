@@ -25,7 +25,7 @@ class _MainPageState extends State<MainPage> {
   ];
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) {    
     return Scaffold(
       body: Stack(
         children: [
@@ -41,15 +41,15 @@ class _MainPageState extends State<MainPage> {
                 items: [
                   BottomNavigationBarItem(
                     icon: const Icon(Icons.store),
-                    label: Provider.of<NavigationBarProvider>(context).store,
+                    label: "STORE",
                   ),
                   BottomNavigationBarItem(
                     icon: const Icon(Icons.storage),
-                    label: Provider.of<NavigationBarProvider>(context).storage,
+                    label: "STORAGE",
                   ),
                   BottomNavigationBarItem(
                     icon: const Icon(Icons.local_activity_outlined),
-                    label: Provider.of<NavigationBarProvider>(context).activities,
+                    label: "ACTIVITIES",
                   ),
                 ],
                 onTap: (value) {

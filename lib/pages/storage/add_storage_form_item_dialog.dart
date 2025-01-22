@@ -413,11 +413,6 @@ class _AddStorageFormItemDialogState extends State<AddStorageFormItemDialog>
       alignment: Alignment.center,
       child: Row(
         children: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(FontAwesomeIcons.paste),
-            iconSize: 30,
-          ),
           const SizedBox(width: 10),
           Expanded(
             child: ElevatedButton(
@@ -464,8 +459,8 @@ class _AddStorageFormItemDialogState extends State<AddStorageFormItemDialog>
                       width: 22.5,
                       height: 22.5,
                       padding: const EdgeInsets.all(2),
-                      child: CircularProgressIndicator(
-                        color: AppColors.main,
+                      child: const CircularProgressIndicator(
+                        color: Colors.white,
                         strokeWidth: 3,
                       ),
                     )

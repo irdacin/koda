@@ -1,41 +1,30 @@
 import 'package:dropdown_search/dropdown_search.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:koda/helpers/constant.dart';
 import 'package:koda/helpers/localization_mapper.dart';
 import 'package:koda/pages/auth/login_page.dart';
 import 'package:koda/pages/settings/navigation_bar_page.dart';
+import 'package:koda/pages/settings/account_page.dart';
 import 'package:koda/providers/language_provider.dart';
 import 'package:koda/providers/theme_provider.dart';
+import 'package:koda/services/auth_service.dart';
 import 'package:koda/utils/app_colors.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-class SettingsPage extends StatefulWidget {
-  const SettingsPage({super.key});
+class ProfilePage extends StatefulWidget {
+  const ProfilePage({super.key});
 
   @override
-  State<SettingsPage> createState() => _SettingsPageState();
+  State<ProfilePage> createState() => _ProfilePageState();
 }
 
-class _SettingsPageState extends State<SettingsPage> {
+class _ProfilePageState extends State<ProfilePage> {
   final List<String> codeLanguages = [
     "en",
     "id",
   ];
 
-  Future<void> signOutUser() async {
-    await FirebaseAuth.instance.signOut();
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setBool(KEY_LOGGED_IN, false);
-
-    if (!mounted) return;
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (context) => const LoginPage()),
-      (route) => false,
-    );
-  }
+  final AuthService _authService = AuthService();
 
   @override
   Widget build(BuildContext context) {
@@ -48,6 +37,18 @@ class _SettingsPageState extends State<SettingsPage> {
         leadingWidth: 100,
         title: Text(AppLocalizations.of(context)!.profile),
         centerTitle: true,
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => const AccountPage()),
+              );
+            },
+            icon: const Icon(Icons.person),
+            iconSize: 30,
+          ),
+          const SizedBox(width: 10),
+        ],
       ),
       body: Container(
         width: MediaQuery.of(context).size.width,
@@ -177,6 +178,16 @@ class _SettingsPageState extends State<SettingsPage> {
           ],
         ),
       ),
+    );
+  }
+
+  Future<void> signOutUser() async {
+    await _authService.logout();
+
+    if (!mounted) return;
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (context) => const LoginPage()),
+      (route) => false,
     );
   }
 }

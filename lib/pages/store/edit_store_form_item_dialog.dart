@@ -679,18 +679,13 @@ class _EditStoreFormItemDialogState extends State<EditStoreFormItemDialog>
       alignment: Alignment.center,
       child: Row(
         children: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(FontAwesomeIcons.paste),
-            iconSize: 30,
-          ),
           const SizedBox(width: 10),
           Expanded(
             child: ElevatedButton(
               onPressed: () async {
                 if (_isLoadingSaveIntoFirebase) return;
                 setState(() => _isLoadingSaveIntoFirebase = true);
-                _selectedStorageItems.addAll(_addSelectedStorageItems);
+                final usedStorageItems = _selectedStorageItems + _addSelectedStorageItems;
 
                 StoreItem newItem = widget.item.copyWith(
                   image: image != null
@@ -698,7 +693,7 @@ class _EditStoreFormItemDialogState extends State<EditStoreFormItemDialog>
                       : null,
                   name: nameController.text,
                   category: categoryController.text,
-                  usedStorageItems: _selectedStorageItems,
+                  usedStorageItems: usedStorageItems,
                   description: descriptionController.text,
                 );
                 await _storeItemService.updateStoreItem(newItem);
@@ -730,8 +725,8 @@ class _EditStoreFormItemDialogState extends State<EditStoreFormItemDialog>
                       width: 22.5,
                       height: 22.5,
                       padding: const EdgeInsets.all(2),
-                      child: CircularProgressIndicator(
-                        color: AppColors.main,
+                      child: const CircularProgressIndicator(
+                        color: Colors.white,
                         strokeWidth: 3,
                       ),
                     )

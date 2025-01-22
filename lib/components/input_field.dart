@@ -62,23 +62,24 @@ class _InputFieldState extends State<InputField> {
         color: AppColors.text,
       ),
       decoration: InputDecoration(
-        enabledBorder: const OutlineInputBorder(
+        enabledBorder: OutlineInputBorder(
           borderSide: BorderSide(
             width: 1,
-            color: Colors.black,
+            color: AppColors.border,
           ),
-          borderRadius: BorderRadius.all(Radius.circular(10)),
+          borderRadius: const BorderRadius.all(Radius.circular(10)),
         ),
-        focusedBorder: const OutlineInputBorder(
+        focusedBorder: OutlineInputBorder(
           borderSide: BorderSide(
             width: 2,
-            color: Colors.black,
+            color: AppColors.border,
           ),
-          borderRadius: BorderRadius.all(Radius.circular(10)),
+          borderRadius: const BorderRadius.all(Radius.circular(10)),
         ),
         label: Text(widget.labelText ?? ""),
         labelStyle: TextStyle(
-          color: focusText && widget.errorText == null ? Colors.black : null,
+          color: focusText && widget.errorText == null ? AppColors.text : null,
+          fontSize: focusText && widget.errorText == null ? 18 : null,
           fontWeight:
               focusText && widget.errorText == null ? FontWeight.bold : null,
         ),
@@ -95,10 +96,11 @@ class _InputFieldState extends State<InputField> {
           ),
           borderRadius: BorderRadius.all(Radius.circular(10)),
         ),
-        prefixIcon: const Icon(Icons.email),
+        prefixIcon: Icon(widget.icon),
         hintText: widget.hintText,
-        prefixIconColor: widget.errorText != null ? Colors.red : null,
+        prefixIconColor: widget.errorText != null ? Colors.red : AppColors.border,
         suffixIcon: widget.trailing,
+        suffixIconColor: widget.errorText != null ? Colors.red : AppColors.border,
       ),
       obscureText: !widget.isVisible,
     );
