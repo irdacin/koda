@@ -389,7 +389,7 @@ class _StorePageState extends State<StorePage> with WidgetsBindingObserver {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            backgroundColor: AppColors.main,
+                            backgroundColor: Colors.white,
                             textStyle: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 18,
@@ -873,7 +873,7 @@ class _StorePageState extends State<StorePage> with WidgetsBindingObserver {
     );
 
     await _storeItemService.deleteStoreItem(item);
-    await _activitiesService.createActivities(activity);
+    String? idActivity = await _activitiesService.createActivities(activity);
 
     if (!mounted) return;
 
@@ -893,7 +893,7 @@ class _StorePageState extends State<StorePage> with WidgetsBindingObserver {
         textColor: AppColors.selected,
         onPressed: () {
           _storeItemService.undoDeleteItem(item);
-          _activitiesService.deleteActivity(activity);
+          _activitiesService.deleteActivity(activity.copyWith(id: idActivity));
         },
       ),
     ));

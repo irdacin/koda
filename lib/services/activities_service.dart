@@ -5,13 +5,18 @@ class ActivitiesService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final String _tableName = "activities";
 
-  Future<void> createActivities(Activity activities) async {
+  Future<String?> createActivities(Activity activity) async {
+    String? id;
     try {
       await _firestore
           .collection(_tableName)
-          .doc()
-          .set(activities.toFirestore());
+          .add(activity.toFirestore())
+          .then(
+        (doc) => id = doc.id,
+      );
     } catch (_) {}
+
+    return id;
   }
 
   Stream<List<Activity>> getActivities({
@@ -52,6 +57,8 @@ class ActivitiesService {
   }
 
   Future<void> deleteActivity(Activity activity) async {
+    print("masuk");
+    print(activity.id);
     await _firestore.collection(_tableName).doc(activity.id).delete();
   }
 }

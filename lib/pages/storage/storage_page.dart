@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:koda/components/filter_chip_section.dart';
 import 'package:koda/components/search_bar_field.dart';
 import 'package:koda/helpers/format_number.dart';
@@ -313,8 +314,8 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
                     height: 100,
                     decoration: BoxDecoration(
                       color: Theme.of(context).brightness == Brightness.light
-                                  ? const Color(0xffc3c3c3)
-                                  : AppColors.darkMain,
+                          ? const Color(0xffc3c3c3)
+                          : AppColors.darkMain,
                       borderRadius: BorderRadius.circular(15),
                     ),
                   )
@@ -579,16 +580,25 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
     setState(() => _openDialog = false);
   }
 
-  void _showCannotDeleteDialog() {
+  void _showDeleteAlertDialog() {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Cannot Delete"),
-        content: const Text("This item is used on store"),
+        title: Text(
+          "${AppLocalizations.of(context)!.delete}?",
+          style: GoogleFonts.poppins(),
+        ),
+        content: Text(
+          "${AppLocalizations.of(context)!.thisItemCannotDelete}.\n${AppLocalizations.of(context)!.tryToDdeleteAllStoreItemFirst}.",
+          style: GoogleFonts.poppins(),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text("OK"),
+            child: Text(
+              AppLocalizations.of(context)!.ok,
+              style: GoogleFonts.poppins(),
+            ),
           ),
         ],
       ),
@@ -826,7 +836,7 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
 
     bool isDeleted = await _storageItemService.deleteStorageItem(item);
     if (!isDeleted) {
-      _showCannotDeleteDialog();
+      _showDeleteAlertDialog();
       return;
     }
 
@@ -837,7 +847,8 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
         "desc": "Deleted Storage Item",
       },
     );
-    await _activitiesService.createActivities(activity);
+
+    String? idActivity = await _activitiesService.createActivities(activity);
 
     if (!mounted) return;
 
@@ -857,7 +868,7 @@ class _StoragePageState extends State<StoragePage> with WidgetsBindingObserver {
         textColor: AppColors.selected,
         onPressed: () {
           _storageItemService.undoDeleteItem(item);
-          _activitiesService.deleteActivity(activity);
+          _activitiesService.deleteActivity(activity.copyWith(id: idActivity));
         },
       ),
     ));

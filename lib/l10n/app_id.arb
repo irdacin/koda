@@ -42,6 +42,7 @@
   "listItemsThatUseThisItem": "Daftar item yang menggunakan item ini",
   "login": "Masuk",
   "navigationBar": "Bar Navigasi",
+  "ok": "Oke",
   "oneStorageItemDeleted": "1 item storage dihapus",
   "oneStoreItemDeleted": "1 item store dihapus",
   "orderLists": "Daftar Pesanan",
@@ -60,7 +61,9 @@
   "sold": "Terjual",
   "takePicture": "Ambil Gambar",
   "theme": "Tema",
+  "thisItemCannotDelete": "Item ini tidak dapat dihapus",
   "today": "Hari Ini",
+  "tryToDdeleteAllStoreItemFirst": "Coba untuk hapus semua item store terlebih dahulu ",
   "undo": "Urungkan",
   "updatedLists": "Daftar Terbaru"
 }

@@ -50,7 +50,7 @@ class _NavigationBarPageState extends State<NavigationBarPage> {
                 alignment: Alignment.topCenter,
                 child: Text(
                   AppLocalizations.of(context)!.holdAndDragToArrangeNavigation,
-                  style: TextStyle(fontSize: 16),
+                  style: const TextStyle(fontSize: 16),
                   textAlign: TextAlign.center,
                 ),
               ),
