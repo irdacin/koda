@@ -18,6 +18,12 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   int index = 0;
 
+  List<String> navBarLabel = [
+    "STORE",
+    "STORAGE",
+    "ACTIVITIES",
+  ];
+
   final List<Widget> pages = [
     const StorePage(),
     const StoragePage(),
@@ -26,41 +32,37 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {    
-    return Scaffold(
-      body: Stack(
-        children: [
-          pages[index],
-          if (MediaQuery.of(context).viewInsets.bottom <= 0)
-            Positioned(
-              bottom: 0,
-              left: 10,
-              right: 10,
-              child: BottomNavBar(
-                currentIndex: index,
-                backgroundColor: Provider.of<ThemeProvider>(context).themeMode == ThemeMode.light ? AppColors.background : AppColors.background,
-                items: [
-                  BottomNavigationBarItem(
-                    icon: const Icon(Icons.store),
-                    label: "STORE",
+    return Consumer<NavigationBarProvider>(
+      builder: (context, provider, child) {
+        return Scaffold(
+          body: Stack(
+            children: [
+              pages[navBarLabel.indexOf(provider.navBarLabel[index])],
+              if (MediaQuery.of(context).viewInsets.bottom <= 0)
+                Positioned(
+                  bottom: 0,
+                  left: 10,
+                  right: 10,
+                  child: BottomNavBar(
+                    currentIndex: index,
+                    backgroundColor: Provider.of<ThemeProvider>(context).themeMode == ThemeMode.light ? AppColors.background : AppColors.background,
+                    items: provider.navBarLabel.map((e) {
+                      return BottomNavigationBarItem(
+                        icon: const Icon(Icons.store),
+                        label: e,
+                      );
+                    },).toList(),
+                    onTap: (value) {
+                      setState(() {
+                        index = value;
+                      });
+                    },
                   ),
-                  BottomNavigationBarItem(
-                    icon: const Icon(Icons.storage),
-                    label: "STORAGE",
-                  ),
-                  BottomNavigationBarItem(
-                    icon: const Icon(Icons.local_activity_outlined),
-                    label: "ACTIVITIES",
-                  ),
-                ],
-                onTap: (value) {
-                  setState(() {
-                    index = value;
-                  });
-                },
-              ),
-            ),
-        ],
-      ),
+                ),
+            ],
+          ),
+        );
+      }
     );
   }
 }

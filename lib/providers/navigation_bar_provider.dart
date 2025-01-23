@@ -3,27 +3,25 @@ import 'package:koda/helpers/constant.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class NavigationBarProvider extends ChangeNotifier {
-  late int _store;
-  late int _storage;
-  late int _activities;
-  int get store => _store;
-  int get storage => _storage;
-  int get activities => _activities;
+  List<String> _navBarLabel = ["STORE", "STORAGE", "ACTIVITIES"];
+
+  List<String> get navBarLabel => _navBarLabel;
 
   NavigationBarProvider() {
-    _initiliazeNavigationBar();
+    _initializeNavigationBar();
   }
 
-  Future<void> _initiliazeNavigationBar() async {
+  Future<void> _initializeNavigationBar() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    _store = prefs.getInt(KEY_NAVIGATION_BAR_STORE) ?? 0;
-    _storage = prefs.getInt(KEY_NAVIGATION_BAR_STORAGE) ?? 1;
-    _activities = prefs.getInt(KEY_NAVIGATION_BAR_ACTIVITIES) ?? 2;
+    _navBarLabel = prefs.getStringList(KEY_NAVIGATION_BAR_LABEL) ??
+        ["STORE", "STORAGE", "ACTIVITIES"];
     notifyListeners();
   }
-  
-  Future<void> _saveNavigationBarName(String key, String newValue) async {
+
+  Future<void> saveNavigationOrder(List<String> newOrder) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString(key, newValue);
+    _navBarLabel = newOrder;
+    await prefs.setStringList(KEY_NAVIGATION_BAR_LABEL, newOrder);
+    notifyListeners();
   }
 }
