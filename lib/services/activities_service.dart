@@ -57,8 +57,6 @@ class ActivitiesService {
   }
 
   Future<void> deleteActivity(Activity activity) async {
-    print("masuk");
-    print(activity.id);
     await _firestore.collection(_tableName).doc(activity.id).delete();
   }
 }
